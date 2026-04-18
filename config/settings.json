@@ -1,0 +1,23 @@
+{
+  "api": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [],
+    "ask": [
+      "Bash(rm *)",
+      "Bash(npm *)",
+      "Write"
+    ]
+  },
+  "ui": {
+    "theme": "dark",
+    "output_style": "explanatory"
+  }
+}
