@@ -28,8 +28,9 @@ console = Console()
 @click.option("--model", "-m", help="Model to use")
 @click.option("--cwd", type=click.Path(), help="Working directory")
 @click.option("--base-url", help="API base URL (for compatible APIs)")
+@click.option("--tui", "-t", is_flag=True, help="Launch TUI mode")
 @click.pass_context
-def main(ctx: click.Context, version: bool, model: str | None, cwd: str | None, base_url: str | None) -> None:
+def main(ctx: click.Context, version: bool, model: str | None, cwd: str | None, base_url: str | None, tui: bool) -> None:
     """Claude Code Python - AI-powered coding assistant for terminal."""
     if version:
         console.print(f"claude-code-py version {__version__}")
@@ -59,7 +60,18 @@ def main(ctx: click.Context, version: bool, model: str | None, cwd: str | None, 
 
     # If no subcommand, enter REPL mode
     if ctx.invoked_subcommand is None:
-        ctx.invoke(repl)
+        if tui:
+            # Launch TUI mode
+            run_tui_mode(config, session)
+        else:
+            ctx.invoke(repl)
+
+
+def run_tui_mode(config: Config, session: Session) -> None:
+    """Launch TUI application."""
+    from .ui.app import ClaudeCodeApp
+    app = ClaudeCodeApp(config=config, session=session)
+    app.run()
 
 
 @main.command()
