@@ -1,25 +1,42 @@
-"""Anthropic API client with streaming and compatible API support."""
+"""Anthropic API client with streaming, retry, and error handling."""
 
+import asyncio
 import os
-from typing import AsyncIterator, Any
+from typing import AsyncIterator, Any, Callable
 
 import httpx
-from anthropic import AsyncAnthropic
+from anthropic import AsyncAnthropic, APIError, RateLimitError, APIConnectionError
+
+
+class RetryConfig:
+    """Retry configuration."""
+
+    max_retries: int = 3
+    retry_delay: float = 1.0  # seconds
+    retry_multiplier: float = 2.0  # exponential backoff
+    retry_on_errors: tuple = (RateLimitError, APIConnectionError)
 
 
 class APIClient:
-    """API client supporting Anthropic and compatible APIs."""
+    """API client supporting Anthropic and compatible APIs with retry."""
 
     def __init__(
         self,
         api_key: str | None = None,
         base_url: str | None = None,
         model: str = "claude-sonnet-4-6",
+        retry_config: RetryConfig | None = None,
     ):
         # Get from environment if not provided
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         self.base_url = base_url or os.environ.get("ANTHROPIC_BASE_URL")
         self.model = model
+        self.retry_config = retry_config or RetryConfig()
+
+        # Usage tracking
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.api_calls = 0
 
         # Initialize client
         self._init_client()
@@ -43,9 +60,7 @@ class APIClient:
         stream: bool = True,
     ) -> AsyncIterator[dict]:
         """
-        Create a message with streaming response.
-
-        Yields content blocks as they arrive.
+        Create a message with streaming response and retry logic.
         """
         params = {
             "model": self.model,
@@ -58,13 +73,51 @@ class APIClient:
         if tools:
             params["tools"] = tools
 
-        if stream:
-            async with self.client.messages.stream(**params) as stream:
-                for event in stream:
-                    yield self._process_stream_event(event)
-        else:
-            response = await self.client.messages.create(**params)
-            yield {"type": "message", "message": response}
+        # Retry loop
+        for attempt in range(self.retry_config.max_retries):
+            try:
+                self.api_calls += 1
+
+                if stream:
+                    async with self.client.messages.stream(**params) as stream:
+                        usage = None
+                        for event in stream:
+                            # Track usage
+                            if hasattr(event, "message") and hasattr(event.message, "usage"):
+                                usage = event.message.usage
+                            yield self._process_stream_event(event)
+
+                        # Record usage
+                        if usage:
+                            self.total_input_tokens += usage.input_tokens
+                            self.total_output_tokens += usage.output_tokens or 0
+                else:
+                    response = await self.client.messages.create(**params)
+                    self.total_input_tokens += response.usage.input_tokens
+                    self.total_output_tokens += response.usage.output_tokens
+                    yield {"type": "message", "message": response}
+
+                # Success - break retry loop
+                break
+
+            except self.retry_config.retry_on_errors as e:
+                if attempt < self.retry_config.max_retries - 1:
+                    delay = self.retry_config.retry_delay * (
+                        self.retry_config.retry_multiplier ** attempt
+                    )
+                    yield {
+                        "type": "retry",
+                        "attempt": attempt + 1,
+                        "delay": delay,
+                        "error": str(e),
+                    }
+                    await asyncio.sleep(delay)
+                else:
+                    yield {"type": "error", "error": str(e), "final": True}
+
+            except APIError as e:
+                yield {"type": "error", "error": str(e)}
+                break
 
     def _process_stream_event(self, event: Any) -> dict:
         """Process a streaming event."""
@@ -101,11 +154,17 @@ class APIClient:
                             "index": event.index,
                         }
 
+            elif event_type == "content_block_stop":
+                return {"type": "content_block_stop", "index": event.index}
+
             elif event_type == "message_stop":
                 return {"type": "message_stop"}
 
             elif event_type == "message_start":
                 return {"type": "message_start", "message": event.message}
+
+            elif event_type == "ping":
+                return {"type": "ping"}
 
         return {"type": "unknown", "event": str(event)}
 
@@ -122,40 +181,101 @@ class APIClient:
             return self._estimate_tokens(messages)
 
     def _estimate_tokens(self, messages: list[dict]) -> int:
-        """Estimate token count (rough)."""
+        """Estimate token count (rough: ~4 chars per token)."""
         total = 0
         for msg in messages:
             content = msg.get("content", "")
             if isinstance(content, str):
-                # Rough: 1 token ~ 4 chars
                 total += len(content) // 4
             elif isinstance(content, list):
                 for block in content:
                     if isinstance(block, dict):
                         if block.get("type") == "text":
                             total += len(block.get("text", "")) // 4
+                        elif block.get("type") == "tool_result":
+                            total += len(block.get("content", "")) // 4
         return total
+
+    def get_usage_stats(self) -> dict:
+        """Get usage statistics."""
+        return {
+            "input_tokens": self.total_input_tokens,
+            "output_tokens": self.total_output_tokens,
+            "total_tokens": self.total_input_tokens + self.total_output_tokens,
+            "api_calls": self.api_calls,
+        }
 
 
 class CompatClient(APIClient):
-    """Client for compatible APIs (智谱 Coding Plan, etc.)."""
+    """Client for compatible APIs (智谱 Coding Plan, DeepSeek, etc.)."""
+
+    # Known compatible API configurations
+    COMPAT_PROVIDERS = {
+        "zhipu": {
+            "base_url": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
+            "models": ["glm-4-plus", "glm-4", "glm-5", "glm-5-air"],
+        },
+        "deepseek": {
+            "base_url": "https://api.deepseek.com",
+            "models": ["deepseek-chat", "deepseek-coder"],
+        },
+        "moonshot": {
+            "base_url": "https://api.moonshot.cn/v1",
+            "models": ["moonshot-v1-8k", "moonshot-v1-32k"],
+        },
+        "siliconflow": {
+            "base_url": "https://api.siliconflow.cn/v1",
+            "models": ["Qwen/Qwen2.5-72B-Instruct"],
+        },
+    }
 
     def __init__(
         self,
         api_key: str | None = None,
-        base_url: str = "https://coding.dashscope.aliyuncs.com/apps/anthropic",
-        model: str = "glm-5",  # 智谱 model
+        base_url: str | None = None,
+        model: str | None = None,
+        provider: str | None = None,
     ):
-        super().__init__(api_key=api_key, base_url=base_url, model=model)
+        # Auto-detect provider from base_url or model
+        if provider and provider in self.COMPAT_PROVIDERS:
+            config = self.COMPAT_PROVIDERS[provider]
+            base_url = base_url or config["base_url"]
+            model = model or config["models"][0]
+
+        super().__init__(
+            api_key=api_key,
+            base_url=base_url or "https://coding.dashscope.aliyuncs.com/apps/anthropic",
+            model=model or "glm-5",
+        )
 
 
-def get_client(model: str | None = None, base_url: str | None = None) -> APIClient:
-    """Get appropriate API client."""
+def get_client(
+    model: str | None = None,
+    base_url: str | None = None,
+    provider: str | None = None,
+) -> APIClient:
+    """Get appropriate API client based on configuration."""
     effective_model = model or os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     effective_base_url = base_url or os.environ.get("ANTHROPIC_BASE_URL")
 
     # Check if using compatible API
+    if provider:
+        return CompatClient(model=effective_model, base_url=effective_base_url, provider=provider)
+
     if effective_base_url and "anthropic.com" not in effective_base_url:
         return CompatClient(model=effective_model, base_url=effective_base_url)
 
     return APIClient(model=effective_model)
+
+
+def detect_provider_from_url(url: str) -> str | None:
+    """Detect provider from URL."""
+    if "dashscope" in url or "aliyuncs" in url:
+        return "zhipu"
+    if "deepseek" in url:
+        return "deepseek"
+    if "moonshot" in url:
+        return "moonshot"
+    if "siliconflow" in url:
+        return "siliconflow"
+    return None
