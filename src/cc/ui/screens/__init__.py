@@ -1,24 +1,68 @@
-"""Screens for TUI."""
+"""Screens package - Multiple screens for different functionality."""
 
+from __future__ import annotations
+from textual.binding import Binding
 from textual.screen import Screen
-from textual.containers import Container, Vertical, Horizontal
+from textual.containers import Container, Vertical, Horizontal, VerticalScroll
 from textual.widgets import Header, Footer, Static, Button, Label
+
+from .screens import (
+    HelpScreen,
+    SessionsScreen,
+    SessionLoadRequest,
+    PluginsScreen,
+    HooksScreen,
+    SettingsScreen,
+    StatsScreen,
+    MessageHistoryScreen,
+)
 
 
 class DoctorScreen(Screen):
     """Diagnostic screen."""
 
+    CSS = """
+    DoctorScreen {
+        layout: vertical;
+    }
+
+    #diagnostic-output {
+        height: 1fr;
+        overflow-y: auto;
+        padding: 1;
+    }
+    """
+
+    BINDINGS = [
+        Binding("escape", "back", "Back"),
+    ]
+
     def compose(self):
         yield Header()
         yield Container(
-            Static("Running diagnostics...", id="diagnostic-output"),
+            VerticalScroll(
+                Static("Running diagnostics...", id="diagnostic-output"),
+            ),
             id="doctor-content",
         )
         yield Footer()
 
+    def action_back(self) -> None:
+        self.app.pop_screen()
+
 
 class ConfigScreen(Screen):
     """Configuration screen."""
+
+    CSS = """
+    ConfigScreen {
+        layout: vertical;
+    }
+    """
+
+    BINDINGS = [
+        Binding("escape", "back", "Back"),
+    ]
 
     def compose(self):
         yield Header()
@@ -29,48 +73,19 @@ class ConfigScreen(Screen):
         )
         yield Footer()
 
+    def action_back(self) -> None:
+        self.app.pop_screen()
 
-class HelpScreen(Screen):
-    """Help screen."""
 
-    def compose(self):
-        yield Header()
-        yield Container(
-            Static(self._get_help_content()),
-            id="help-content",
-        )
-        yield Footer()
-
-    def _get_help_content(self) -> str:
-        return """
-# Claude Code Python Help
-
-## Commands
-- /help - Show help
-- /commit [msg] - Create git commit
-- /review - Review changes
-- /compact - Compress context
-- /doctor - Diagnostics
-- /mcp - MCP management
-- /memory - Memory management
-- /skills - Skill management
-- /clear - Clear session
-- /exit - Exit
-
-## Shortcuts
-- Ctrl+C - Quit
-- Ctrl+L - Clear
-- Ctrl+D - Doctor
-- Ctrl+H - Help
-
-## Tools Available
-- Bash - Run shell commands
-- Read - Read files
-- Write - Write files
-- Edit - Edit files
-- Glob - Find files
-- Grep - Search content
-- WebFetch - Fetch URLs
-- WebSearch - Search web
-- Task - Task management
-"""
+__all__ = [
+    "HelpScreen",
+    "SessionsScreen",
+    "SessionLoadRequest",
+    "PluginsScreen",
+    "HooksScreen",
+    "SettingsScreen",
+    "StatsScreen",
+    "MessageHistoryScreen",
+    "DoctorScreen",
+    "ConfigScreen",
+]

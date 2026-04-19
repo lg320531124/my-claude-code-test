@@ -1,5 +1,6 @@
 """Compact command - Context compression."""
 
+from __future__ import annotations
 from rich.console import Console
 
 from ..core.session import Session

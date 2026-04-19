@@ -1,9 +1,10 @@
 """Resume command - Resume previous session."""
 
+from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -15,7 +16,7 @@ from ..core.session import Session
 SESSIONS_DIR = Path.home() / ".claude-code-py" / "sessions"
 
 
-def run_resume(console: Console, session_id: str | None = None) -> Session | None:
+def run_resume(console: Console, session_id: Optional[str] = None) -> Session | None:
     """Resume a previous session."""
     SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -75,7 +76,7 @@ def load_session(console: Console, session_id: str) -> Session | None:
     return None
 
 
-def list_sessions() -> list[dict]:
+def list_sessions() -> List[dict]:
     """List all saved sessions."""
     sessions = []
 

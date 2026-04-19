@@ -1,5 +1,6 @@
 """Memory command - Persistent memory management."""
 
+from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
@@ -11,7 +12,7 @@ from rich.table import Table
 MEMORY_DIR = Path.home() / ".claude-code-py" / "memory"
 
 
-def run_memory(console: Console, action: str = "list", name: str | None = None) -> None:
+def run_memory(console: Console, action: str = "list", name: Optional[str] = None) -> None:
     """Manage persistent memories."""
     MEMORY_DIR.mkdir(parents=True, exist_ok=True)
 

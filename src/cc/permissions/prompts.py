@@ -1,160 +1,220 @@
-"""Permission prompts - User interaction for permission decisions."""
+"""Enhanced Permission Prompter with persistence."""
 
+from __future__ import annotations
 import asyncio
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Optional
 
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
+from rich.panel import Panel
 
 from ..types.permission import PermissionDecision, PermissionResult
+from .persistence import PermissionPersistence, SessionMemory, hash_input
 
 
 console = Console()
 
 
-class PermissionPrompter:
-    """Handles user prompts for permission decisions."""
+class EnhancedPermissionPrompter:
+    """Permission prompter with persistence and session memory."""
 
-    def __init__(self, auto_approve: bool = False):
+    def __init__(
+        self,
+        auto_approve: bool = False,
+        project_dir: Optional[Path] = None,
+        save_decisions: bool = True,
+    ):
         self.auto_approve = auto_approve
-        self.session_decisions: dict[str, PermissionDecision] = {}
+        self.persistence = PermissionPersistence(project_dir)
+        self.session_memory = SessionMemory()
+        self.save_decisions = save_decisions
+
+        # Callbacks
+        self._on_decision: Optional[Callable, Optional] = None
 
     async def prompt(
         self,
         tool_name: str,
         tool_input: dict,
-        reason: str | None = None,
+        reason: Optional[str] = None,
     ) -> PermissionDecision:
-        """Prompt user for permission decision."""
-        # Check if already decided this session
-        key = f"{tool_name}:{str(tool_input)[:50]}"
-        if key in self.session_decisions:
-            return self.session_decisions[key]
+        """Prompt for permission with persistence."""
+        input_hash = hash_input(tool_name, tool_input)
 
-        # Auto approve if enabled
+        # 1. Check session memory (highest priority)
+        session_decision = self.session_memory.get(tool_name, input_hash)
+        if session_decision:
+            return session_decision
+
+        # 2. Check persistence
+        pattern = f"{tool_name}*"
+        saved_decision = self.persistence.get_decision(pattern)
+        if saved_decision:
+            self.session_memory.set(tool_name, input_hash, saved_decision)
+            return saved_decision
+
+        # 3. Auto approve if enabled
         if self.auto_approve:
             return PermissionDecision.ALLOW
 
-        # Show prompt
-        return await self._show_prompt(tool_name, tool_input, reason)
+        # 4. Show prompt
+        return await self._show_prompt(tool_name, tool_input, reason, input_hash)
 
     async def _show_prompt(
         self,
         tool_name: str,
         tool_input: dict,
-        reason: str | None,
+        reason: Optional[str],
+        input_hash: str,
     ) -> PermissionDecision:
-        """Show interactive prompt."""
+        """Show interactive prompt with more options."""
         console.print()
-        console.print(f"[bold yellow]Permission Required[/bold yellow]")
-        console.print(f"[cyan]Tool:[/cyan] {tool_name}")
+        console.print(Panel(
+            f"[cyan]Tool:[/cyan] {tool_name}\n"
+            f"{self._format_input(tool_name, tool_input)}\n"
+            f"[dim]Reason: {reason or 'No matching rule'}[/dim]",
+            title="[bold yellow]Permission Required[/bold yellow]",
+            border_style="yellow",
+        ))
 
-        # Show input summary
-        if tool_name == "Bash" and "command" in tool_input:
-            console.print(f"[cyan]Command:[/cyan] {tool_input['command']}")
-        elif tool_name == "Write" and "file_path" in tool_input:
-            console.print(f"[cyan]File:[/cyan] {tool_input['file_path']}")
-            console.print(f"[cyan]Size:[/cyan] {len(tool_input.get('content', ''))} chars")
-        elif tool_name == "Edit" and "file_path" in tool_input:
-            console.print(f"[cyan]File:[/cyan] {tool_input['file_path']}")
-            console.print(f"[cyan]Old:[/cyan] {tool_input.get('old_string', '')[:50]}...")
-        else:
-            console.print(f"[cyan]Input:[/cyan] {str(tool_input)[:100]}")
-
-        if reason:
-            console.print(f"[dim]Reason: {reason}[/dim]")
-
+        # Extended options
         console.print()
+        console.print("[dim]Options:[/dim]")
+        console.print("  [green]y[/green] - Allow once")
+        console.print("  [green]Y[/green] - Always allow (save)")
+        console.print("  [red]n[/red] - Deny once")
+        console.print("  [red]N[/red] - Always deny (save)")
+        console.print("  [yellow]s[/yellow] - Allow for session")
+        console.print("  [cyan]i[/cyan] - Show more info")
 
-        # Options
-        options = ["y", "n", "a", "d"]
-        response = Prompt.ask(
-            "Allow this action?",
-            choices=options,
-            default="y",
-            show_choices=True,
-        )
+        response = Prompt.ask("Your choice?", default="y")
 
-        decision = self._parse_response(response)
+        decision = self._parse_response(response, tool_name, input_hash)
 
-        # Remember for this session
-        key = f"{tool_name}:{str(tool_input)[:50]}"
-        self.session_decisions[key] = decision
+        if self._on_decision:
+            self._on_decision(tool_name, tool_input, decision)
 
         return decision
 
-    def _parse_response(self, response: str) -> PermissionDecision:
-        """Parse user response to decision."""
+    def _format_input(self, tool_name: str, tool_input: dict) -> str:
+        """Format tool input for display."""
+        if tool_name == "Bash":
+            cmd = tool_input.get("command", "")
+            return f"[cyan]Command:[/cyan] {cmd}"
+        elif tool_name == "Write":
+            path = tool_input.get("file_path", "")
+            size = len(tool_input.get("content", ""))
+            return f"[cyan]File:[/cyan] {path}\n[cyan]Size:[/cyan] {size} chars"
+        elif tool_name == "Edit":
+            path = tool_input.get("file_path", "")
+            old = tool_input.get("old_string", "")[:50]
+            new = tool_input.get("new_string", "")[:50]
+            return f"[cyan]File:[/cyan] {path}\n[cyan]Old:[/cyan] {old}...\n[cyan]New:[/cyan] {new}..."
+        elif tool_name == "Read":
+            path = tool_input.get("file_path", "")
+            return f"[cyan]File:[/cyan] {path}"
+        else:
+            return f"[cyan]Input:[/cyan] {str(tool_input)[:100]}"
+
+    def _parse_response(
+        self,
+        response: str,
+        tool_name: str,
+        input_hash: str,
+    ) -> PermissionDecision:
+        """Parse user response."""
         response = response.lower()
+
+        pattern = f"{tool_name}*"
 
         if response == "y":
             console.print("[green]✓ Allowed[/green]")
+            self.session_memory.set(tool_name, input_hash, PermissionDecision.ALLOW)
+            return PermissionDecision.ALLOW
+        elif response == "yy" or response == "Y":
+            console.print("[green]✓ Always allowed (saved)[/green]")
+            if self.save_decisions:
+                self.persistence.save_decision(pattern, PermissionDecision.ALLOW)
+            self.session_memory.set(tool_name, input_hash, PermissionDecision.ALLOW)
             return PermissionDecision.ALLOW
         elif response == "n":
             console.print("[red]✗ Denied[/red]")
+            self.session_memory.set(tool_name, input_hash, PermissionDecision.DENY)
             return PermissionDecision.DENY
-        elif response == "a":
-            console.print("[green]✓ Always allowed[/green]")
+        elif response == "nn" or response == "N":
+            console.print("[red]✗ Always denied (saved)[/red]")
+            if self.save_decisions:
+                self.persistence.save_decision(pattern, PermissionDecision.DENY)
+            self.session_memory.set(tool_name, input_hash, PermissionDecision.DENY)
+            return PermissionDecision.DENY
+        elif response == "s":
+            console.print("[yellow]✓ Allowed for this session[/yellow]")
+            self.session_memory.set(tool_name, input_hash, PermissionDecision.ALLOW)
             return PermissionDecision.ALLOW
-        elif response == "d":
-            console.print("[red]✗ Always denied[/red]")
-            return PermissionDecision.DENY
+        elif response == "i":
+            # Show more info - then ask again
+            console.print("[dim]This action requires permission because it may modify files or execute commands.[/dim]")
+            return PermissionDecision.ASK
 
         return PermissionDecision.ASK
 
+    def set_callback(self, callback: Callable, Optional) -> None:
+        """Set decision callback."""
+        self._on_decision = callback
 
-def show_permission_rules(console: Console) -> None:
-    """Show current permission rules."""
-    from ..utils.config import Config
-    config = Config.load()
+    def get_stats(self) -> dict:
+        """Get permission stats."""
+        return {
+            "session_decisions": len(self.session_memory.decisions),
+            "saved_decisions": len(self.persistence.decisions),
+            "auto_approve": self.auto_approve,
+        }
 
-    table = Table(title="Permission Rules")
-    table.add_column("Decision", style="cyan")
-    table.add_column("Pattern")
 
-    for pattern in config.permissions.deny:
-        table.add_row("[red]DENY[/]", pattern)
+def show_saved_permissions(console: Console, project_dir: Optional[Path] = None) -> None:
+    """Show saved permission decisions."""
+    persistence = PermissionPersistence(project_dir)
+    decisions = persistence.list_decisions()
 
-    for pattern in config.permissions.ask:
-        table.add_row("[yellow]ASK[/]", pattern)
+    if not decisions:
+        console.print("[dim]No saved permission decisions[/dim]")
+        return
 
-    for pattern in config.permissions.allow:
-        table.add_row("[green]ALLOW[/]", pattern)
+    table = Table(title="Saved Permission Decisions")
+    table.add_column("Pattern", style="cyan")
+    table.add_column("Decision")
+    table.add_column("Expires")
+    table.add_column("Status")
+
+    for entry in decisions:
+        status = "[red]Expired[/red]" if entry["expired"] else "[green]Active[/green]"
+        decision_color = "green" if entry["decision"] == "allow" else "red"
+        expires_str = time.strftime(
+            "%Y-%m-%d",
+            time.localtime(entry["expires"]),
+        )
+
+        table.add_row(
+            entry["pattern"],
+            f"[{decision_color}]{entry['decision']}[/]",
+            expires_str,
+            status,
+        )
 
     console.print(table)
 
 
-def add_permission_rule(
-    pattern: str,
-    decision: PermissionDecision,
-    save: bool = True,
-) -> None:
-    """Add a permission rule."""
-    from ..utils.config import Config
-    config = Config.load()
-
-    # Remove from other lists first
-    config.permissions.allow = [p for p in config.permissions.allow if p != pattern]
-    config.permissions.deny = [p for p in config.permissions.deny if p != pattern]
-    config.permissions.ask = [p for p in config.permissions.ask if p != pattern]
-
-    # Add to appropriate list
-    if decision == PermissionDecision.ALLOW:
-        config.permissions.allow.append(pattern)
-    elif decision == PermissionDecision.DENY:
-        config.permissions.deny.append(pattern)
-    elif decision == PermissionDecision.ASK:
-        config.permissions.ask.append(pattern)
-
-    if save:
-        config.save()
+def clear_permissions(console: Console, project_dir: Optional[Path] = None) -> None:
+    """Clear all saved permissions."""
+    persistence = PermissionPersistence(project_dir)
+    cleared = persistence.clear_expired()
+    console.print(f"[green]Cleared {cleared} expired permissions[/green]")
 
 
-# Permission mode descriptions
-PERMISSION_MODES = {
-    "default": "Prompt for dangerous operations",
-    "auto": "Auto-approve safe operations, prompt for risky",
-    "bypass": "Allow all operations without prompting",
-    "plan": "Plan mode - restricted operations",
-}
+# Keep old PermissionPrompter for backward compatibility
+PermissionPrompter = EnhancedPermissionPrompter
+
+
+import time  # Add at top of file

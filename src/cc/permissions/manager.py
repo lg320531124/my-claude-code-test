@@ -1,12 +1,13 @@
 """Permission manager."""
 
+from __future__ import annotations
 from ..types.permission import PermissionConfig, PermissionResult, PermissionDecision
 
 
 class PermissionManager:
     """Manages tool execution permissions."""
 
-    def __init__(self, config: PermissionConfig | None = None):
+    def __init__(self, config: Optional[PermissionConfig] = None):
         self.config = config or PermissionConfig()
         self.rules = self.config.to_rules()
 

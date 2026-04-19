@@ -1,5 +1,6 @@
 """Context system prompt."""
 
+from __future__ import annotations
 from pathlib import Path
 
 
@@ -43,7 +44,7 @@ Git branch: {branch}
 """
 
 
-def build_system_prompt(cwd: Path, git_info: dict | None = None) -> str:
+def build_system_prompt(cwd: Path, git_info: Optional[dict] = None) -> str:
     """Build system prompt with context."""
     branch = git_info.get("branch", "unknown") if git_info else "unknown"
 

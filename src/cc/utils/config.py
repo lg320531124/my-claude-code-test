@@ -1,8 +1,9 @@
 """Configuration management."""
 
+from __future__ import annotations
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -14,7 +15,7 @@ class APIConfig(BaseModel):
 
     provider: str = "anthropic"
     model: str = "claude-sonnet-4-6"
-    base_url: str | None = None
+    base_url: Optional[str] = None
     max_tokens: int = 8192
 
 
@@ -33,7 +34,7 @@ class Config(BaseModel):
     ui: UIConfig = UIConfig()
 
     @classmethod
-    def load(cls, path: Path | None = None) -> "Config":
+    def load(cls, path: Optional[Path] = None) -> "Config":
         """Load configuration from file."""
         if path is None:
             path = cls.get_default_path()
@@ -52,7 +53,7 @@ class Config(BaseModel):
         """Get default config path."""
         return Path.home() / ".claude-code-py" / "config.json"
 
-    def save(self, path: Path | None = None) -> None:
+    def save(self, path: Optional[Path] = None) -> None:
         """Save configuration to file."""
         if path is None:
             path = self.get_default_path()
@@ -60,11 +61,11 @@ class Config(BaseModel):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(self.model_dump(), indent=2))
 
-    def get_env_overrides(self) -> dict[str, Any]:
+    def get_env_overrides(self) -> Dict[str, Any, Optional]:
         """Get environment variable overrides."""
         import os
 
-        overrides: dict[str, Any] = {}
+        overrides: Dict[str, Any, Optional] = {}
 
         # API key
         if "ANTHROPIC_API_KEY" in os.environ:

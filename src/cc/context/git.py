@@ -1,5 +1,6 @@
 """Git context collection."""
 
+from __future__ import annotations
 import subprocess
 from pathlib import Path
 
@@ -96,7 +97,7 @@ def get_git_diff(cwd: Path, staged: bool = True) -> str:
         return ""
 
 
-def get_staged_files(cwd: Path) -> list[str]:
+def get_staged_files(cwd: Path) -> List[str]:
     """Get list of staged files."""
     try:
         result = subprocess.run(

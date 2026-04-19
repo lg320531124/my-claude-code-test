@@ -1,9 +1,10 @@
 """MCPTool - Execute MCP server tools."""
 
+from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import ClassVar
+from typing import Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -21,7 +22,7 @@ class MCPTool(ToolDef):
 
     name: ClassVar[str] = "MCP"
     description: ClassVar[str] = "Execute a tool from an MCP server"
-    input_schema: ClassVar[type[ToolInput]] = MCPInput
+    input_schema: ClassVar[type] = MCPInput
 
     MCP_CONFIG = Path.home() / ".claude-code-py" / "mcp.json"
 
@@ -72,7 +73,7 @@ class MCPTool(ToolDef):
 class ListMcpResourcesInput(ToolInput):
     """Input for ListMcpResources."""
 
-    server_name: str | None = None
+    server_name: Optional[str] = None
 
 
 class ListMcpResourcesTool(ToolDef):
@@ -80,7 +81,7 @@ class ListMcpResourcesTool(ToolDef):
 
     name: ClassVar[str] = "ListMcpResources"
     description: ClassVar[str] = "List available resources from MCP servers"
-    input_schema: ClassVar[type[ToolInput]] = ListMcpResourcesInput
+    input_schema: ClassVar[type] = ListMcpResourcesInput
 
     async def execute(self, input: ListMcpResourcesInput, ctx: ToolUseContext) -> ToolResult:
         """List resources."""
@@ -102,7 +103,7 @@ class ReadMcpResourceTool(ToolDef):
 
     name: ClassVar[str] = "ReadMcpResource"
     description: ClassVar[str] = "Read a resource from an MCP server"
-    input_schema: ClassVar[type[ToolInput]] = ReadMcpResourceInput
+    input_schema: ClassVar[type] = ReadMcpResourceInput
 
     async def execute(self, input: ReadMcpResourceInput, ctx: ToolUseContext) -> ToolResult:
         """Read resource."""

@@ -1,7 +1,8 @@
 """WebSearchTool - Web search integration."""
 
+from __future__ import annotations
 import httpx
-from typing import ClassVar
+from typing import ClassVar, List, Optional
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -10,8 +11,8 @@ class WebSearchInput(ToolInput):
     """Input for WebSearchTool."""
 
     query: str
-    allowed_domains: list[str] | None = None
-    blocked_domains: list[str] | None = None
+    allowed_domains: Optional[List[str]] = None
+    blocked_domains: Optional[List[str]] = None
 
 
 class WebSearchTool(ToolDef):
@@ -19,7 +20,7 @@ class WebSearchTool(ToolDef):
 
     name: ClassVar[str] = "WebSearch"
     description: ClassVar[str] = "Search the web for up-to-date information"
-    input_schema: ClassVar[type[ToolInput]] = WebSearchInput
+    input_schema: ClassVar[type] = WebSearchInput
 
     # Default search API (can be overridden)
     search_api_url: str = "https://api.duckduckgo.com/"

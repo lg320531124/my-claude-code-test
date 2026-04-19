@@ -1,5 +1,6 @@
 """System prompts for different scenarios."""
 
+from __future__ import annotations
 from pathlib import Path
 
 
@@ -161,8 +162,8 @@ For each issue, give:
 
 def get_system_prompt(
     scenario: str = "default",
-    cwd: Path | None = None,
-    git_info: dict | None = None,
+    cwd: Optional[Path] = None,
+    git_info: Optional[dict] = None,
 ) -> str:
     """Get appropriate system prompt for the scenario."""
 
@@ -191,8 +192,8 @@ def get_system_prompt(
 
 def build_dynamic_prompt(
     cwd: Path,
-    files_context: dict | None = None,
-    user_preferences: dict | None = None,
+    files_context: Optional[dict] = None,
+    user_preferences: Optional[dict] = None,
 ) -> str:
     """Build a dynamic system prompt with current context."""
 

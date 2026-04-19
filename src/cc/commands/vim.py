@@ -1,12 +1,13 @@
 """Vim command - Vim mode toggle."""
 
+from __future__ import annotations
 from rich.console import Console
 from rich.prompt import Prompt
 
 from ..utils.config import Config
 
 
-def run_vim(console: Console, enable: bool | None = None) -> None:
+def run_vim(console: Console, enable: Optional[bool] = None) -> None:
     """Toggle vim mode."""
     config = Config.load()
 

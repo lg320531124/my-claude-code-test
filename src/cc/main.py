@@ -1,5 +1,6 @@
 """CLI entry point for Claude Code Python."""
 
+from __future__ import annotations
 import asyncio
 import os
 import sys
@@ -30,7 +31,7 @@ console = Console()
 @click.option("--base-url", help="API base URL (for compatible APIs)")
 @click.option("--tui", "-t", is_flag=True, help="Launch TUI mode")
 @click.pass_context
-def main(ctx: click.Context, version: bool, model: str | None, cwd: str | None, base_url: str | None, tui: bool) -> None:
+def main(ctx: click.Context, version: bool, model: Optional[str], cwd: Optional[str], base_url: Optional[str], tui: bool) -> None:
     """Claude Code Python - AI-powered coding assistant for terminal."""
     if version:
         console.print(f"claude-code-py version {__version__}")
@@ -77,7 +78,7 @@ def run_tui_mode(config: Config, session: Session) -> None:
 @main.command()
 @click.argument("prompt", required=False)
 @click.pass_context
-def repl(ctx: click.Context, prompt: str | None) -> None:
+def repl(ctx: click.Context, prompt: Optional[str]) -> None:
     """Start interactive REPL session."""
     config: Config = ctx.obj["config"]
     session: Session = ctx.obj["session"]
@@ -114,7 +115,7 @@ async def _run_repl(
     engine: QueryEngine,
     session: Session,
     config: Config,
-    initial_prompt: str | None,
+    initial_prompt: Optional[str],
 ) -> None:
     """Async REPL loop with streaming."""
     from .types.message import create_user_message
@@ -278,6 +279,8 @@ def show_tasks(console: Console) -> None:
 
 
 # Subcommands
+from .commands.subcommands import init_cmd, config_cmd as config_subcmd, version_cmd, permission_cmd
+
 @main.command()
 @click.argument("message")
 @click.pass_context
@@ -302,9 +305,46 @@ def doctor() -> None:
 
 
 @main.command()
+@click.option("--force", "-f", is_flag=True, help="Overwrite existing")
+@click.option("--template", "-t", default="default", help="Config template")
+def init(force: bool, template: str) -> None:
+    """Initialize project configuration."""
+    init_cmd(force=force, template=template, standalone_mode=False)
+
+
+@main.command()
+@click.argument("key", required=False)
+@click.argument("value", required=False)
+@click.option("--list", "-l", "list_all", is_flag=True, help="List config")
+@click.option("--unset", "-u", is_flag=True, help="Unset key")
+def config(key: Optional[str], value: Optional[str], list_all: bool, unset: bool) -> None:
+    """Manage configuration."""
+    config_subcmd(key=key, value=value, list_all=list_all, unset=unset, standalone_mode=False)
+
+
+@main.command()
+@click.option("--short", "-s", is_flag=True, help="Short output")
+def version(short: bool) -> None:
+    """Show version."""
+    version_cmd(short=short, standalone_mode=False)
+
+
+@main.command()
+@click.argument("pattern", required=False)
+@click.option("--allow", "-a", is_flag=True, help="Allow pattern")
+@click.option("--deny", "-d", is_flag=True, help="Deny pattern")
+@click.option("--ask", "-k", is_flag=True, help="Ask for pattern")
+@click.option("--remove", "-r", is_flag=True, help="Remove pattern")
+@click.option("--list", "-l", "list_all", is_flag=True, help="List rules")
+def permission(pattern: Optional[str], allow: bool, deny: bool, ask: bool, remove: bool, list_all: bool) -> None:
+    """Manage permission rules."""
+    permission_cmd(pattern=pattern, allow=allow, deny=deny, ask=ask, remove=remove, list_all=list_all, standalone_mode=False)
+
+
+@main.command()
 @click.option("--message", "-m", help="Commit message")
 @click.pass_context
-def commit(ctx: click.Context, message: str | None) -> None:
+def commit(ctx: click.Context, message: Optional[str]) -> None:
     """Create a git commit."""
     config: Config = ctx.obj["config"]
     console.print("[yellow]Commit feature coming soon[/yellow]")
@@ -315,33 +355,6 @@ def commit(ctx: click.Context, message: str | None) -> None:
 def review(ctx: click.Context) -> None:
     """Review current changes."""
     console.print("[yellow]Review feature coming soon[/yellow]")
-
-
-@main.command()
-@click.argument("key", required=False)
-@click.argument("value", required=False)
-@click.pass_context
-def config_cmd(ctx: click.Context, key: str | None, value: str | None) -> None:
-    """Manage configuration."""
-    config: Config = ctx.obj["config"]
-
-    if key and value:
-        # Set config value
-        if key == "model":
-            config.api.model = value
-        elif key == "base_url":
-            config.api.base_url = value
-        else:
-            console.print(f"[red]Unknown config key: {key}[/red]")
-            return
-        config.save()
-        console.print(f"[green]Set {key} = {value}[/green]")
-    elif key:
-        # Show specific config
-        console.print(f"[dim]{key}[/dim]")
-    else:
-        # Show all config
-        show_config(console, config)
 
 
 if __name__ == "__main__":

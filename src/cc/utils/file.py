@@ -1,5 +1,6 @@
 """File utilities."""
 
+from __future__ import annotations
 import os
 from pathlib import Path
 from datetime import datetime
@@ -26,7 +27,7 @@ def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
-def safe_read(path: Path, max_size: int = 10_000_000) -> str | None:
+def safe_read(path: Path, max_size: int = 10_000_000) -> Optional[str]:
     """Read file safely with size limit."""
     if not path.exists() or not path.is_file():
         return None

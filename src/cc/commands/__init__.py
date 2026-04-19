@@ -1,10 +1,29 @@
 """Commands module - All slash commands."""
 
+from __future__ import annotations
 from pathlib import Path
 from rich.console import Console
 
 from ..core.session import Session
 from ..utils.config import Config
+
+# CLI subcommands
+from .subcommands import init_cmd, config_cmd, version_cmd, permission_cmd
+
+__all__ = [
+    "handle_command",
+    "init_cmd",
+    "config_cmd",
+    "version_cmd",
+    "permission_cmd",
+    # New commands
+    "advisor_command",
+    "agents_group",
+    "branch_group",
+    "chrome_group",
+    "desktop_group",
+    "terminal_group",
+]
 
 
 async def handle_command(command: str, session: Session, config: Config) -> None:
@@ -95,6 +114,36 @@ async def handle_command(command: str, session: Session, config: Config) -> None
         period = args[0] if args else "session"
         run_usage(console, period)
 
+    # Advisor
+    elif cmd == "/advisor":
+        from .advisor import advisor_command
+        advisor_command(path=args[0] if args else ".", type=args[1] if len(args) > 1 else "all")
+
+    # Agents
+    elif cmd == "/agents":
+        from .agents import agents_group
+        agents_group(args=args)
+
+    # Branch
+    elif cmd == "/branch":
+        from .branch import branch_group
+        branch_group(args=args)
+
+    # Chrome
+    elif cmd == "/chrome":
+        from .chrome import chrome_group
+        chrome_group(args=args)
+
+    # Desktop
+    elif cmd == "/desktop":
+        from .desktop import desktop_group
+        desktop_group(args=args)
+
+    # Terminal
+    elif cmd == "/terminal":
+        from .terminal import terminal_group
+        terminal_group(args=args)
+
     # Session commands
     elif cmd == "/resume":
         from .resume import run_resume
@@ -165,6 +214,18 @@ def show_help(console: Console) -> None:
         # Usage
         ("/cost", "Show usage cost"),
         ("/usage [period]", "Detailed usage"),
+        # Advisor
+        ("/advisor [path]", "Get code advice"),
+        # Agents
+        ("/agents [list|run]", "Manage agents"),
+        # Branch
+        ("/branch [list|create]", "Git branches"),
+        # Chrome
+        ("/chrome [list|open]", "Chrome integration"),
+        # Desktop
+        ("/desktop [status]", "Desktop app"),
+        # Terminal
+        ("/terminal [info]", "Terminal info"),
         # Session
         ("/resume [id]", "Resume session"),
         ("/save", "Save session"),

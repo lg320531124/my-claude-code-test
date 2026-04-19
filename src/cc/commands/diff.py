@@ -1,12 +1,13 @@
 """Diff command - View changes."""
 
+from __future__ import annotations
 import subprocess
 from pathlib import Path
 
 from rich.console import Console
 
 
-def run_diff(console: Console, cwd: Path, file: str | None = None, staged: bool = True) -> None:
+def run_diff(console: Console, cwd: Path, file: Optional[str] = None, staged: bool = True) -> None:
     """View git diff."""
     try:
         if file:

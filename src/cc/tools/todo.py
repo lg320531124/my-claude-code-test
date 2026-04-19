@@ -1,6 +1,7 @@
 """TodoWriteTool - Todo list management."""
 
-from typing import ClassVar
+from __future__ import annotations
+from typing import Optional, ClassVar
 from datetime import datetime
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
@@ -10,17 +11,17 @@ class TodoItem(ToolInput):
     """A todo item."""
 
     content: str
-    activeForm: str | None = None
+    activeForm: Optional[str] = None
 
 
 class TodoWriteInput(ToolInput):
     """Input for TodoWriteTool."""
 
-    todos: list[TodoItem]
+    todos: List[TodoItem]
 
 
 # In-memory todo storage
-_todos: list[dict] = []
+_todos: List[dict] = []
 
 
 class TodoWriteTool(ToolDef):
@@ -28,7 +29,7 @@ class TodoWriteTool(ToolDef):
 
     name: ClassVar[str] = "TodoWrite"
     description: ClassVar[str] = "Write a todo list for tracking work during a session"
-    input_schema: ClassVar[type[ToolInput]] = TodoWriteInput
+    input_schema: ClassVar[type] = TodoWriteInput
 
     async def execute(self, input: TodoWriteInput, ctx: ToolUseContext) -> ToolResult:
         """Write todos."""
@@ -63,7 +64,7 @@ class TodoWriteTool(ToolDef):
         return "\n".join(lines)
 
 
-def get_todos() -> list[dict]:
+def get_todos() -> List[dict]:
     """Get current todos."""
     return _todos
 

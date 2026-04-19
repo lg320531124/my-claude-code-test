@@ -1,5 +1,6 @@
 """Shell execution utilities."""
 
+from __future__ import annotations
 import asyncio
 import subprocess
 from pathlib import Path
@@ -7,7 +8,7 @@ from pathlib import Path
 
 async def run_command(
     command: str,
-    cwd: Path | None = None,
+    cwd: Optional[Path] = None,
     timeout: float = 30.0,
 ) -> tuple[int, str, str]:
     """Run a shell command asynchronously."""
@@ -32,7 +33,7 @@ async def run_command(
 
 def run_command_sync(
     command: str,
-    cwd: Path | None = None,
+    cwd: Optional[Path] = None,
     timeout: float = 30.0,
 ) -> tuple[int, str, str]:
     """Run a shell command synchronously."""

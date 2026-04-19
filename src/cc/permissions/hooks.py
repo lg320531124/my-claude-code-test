@@ -1,5 +1,6 @@
 """Permission hooks - Tool call interception."""
 
+from __future__ import annotations
 from typing import Callable, Any
 
 from ..types.permission import PermissionDecision, PermissionResult

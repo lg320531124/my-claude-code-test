@@ -1,6 +1,7 @@
 """TaskTools - Task management."""
 
-from typing import ClassVar
+from __future__ import annotations
+from typing import Optional, ClassVar
 from datetime import datetime
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
@@ -11,16 +12,16 @@ class TaskCreateInput(ToolInput):
 
     subject: str
     description: str
-    activeForm: str | None = None
+    activeForm: Optional[str] = None
 
 
 class TaskUpdateInput(ToolInput):
     """Input for TaskUpdate."""
 
     taskId: str
-    status: str | None = None
-    subject: str | None = None
-    description: str | None = None
+    status: Optional[str] = None
+    subject: Optional[str] = None
+    description: Optional[str] = None
 
 
 class TaskListInput(ToolInput):
@@ -36,7 +37,7 @@ class TaskGetInput(ToolInput):
 
 
 # In-memory task storage (for now)
-_tasks: dict[str, dict] = {}
+_tasks: Dict[str, dict] = {}
 _task_counter = 0
 
 
@@ -45,7 +46,7 @@ class TaskCreateTool(ToolDef):
 
     name: ClassVar[str] = "TaskCreate"
     description: ClassVar[str] = "Create a structured task to track work"
-    input_schema: ClassVar[type[ToolInput]] = TaskCreateInput
+    input_schema: ClassVar[type] = TaskCreateInput
 
     async def execute(self, input: TaskCreateInput, ctx: ToolUseContext) -> ToolResult:
         """Create task."""
@@ -75,7 +76,7 @@ class TaskUpdateTool(ToolDef):
 
     name: ClassVar[str] = "TaskUpdate"
     description: ClassVar[str] = "Update task status or details"
-    input_schema: ClassVar[type[ToolInput]] = TaskUpdateInput
+    input_schema: ClassVar[type] = TaskUpdateInput
 
     async def execute(self, input: TaskUpdateInput, ctx: ToolUseContext) -> ToolResult:
         """Update task."""
@@ -105,7 +106,7 @@ class TaskListTool(ToolDef):
 
     name: ClassVar[str] = "TaskList"
     description: ClassVar[str] = "List all tasks with their status"
-    input_schema: ClassVar[type[ToolInput]] = TaskListInput
+    input_schema: ClassVar[type] = TaskListInput
 
     async def execute(self, input: TaskListInput, ctx: ToolUseContext) -> ToolResult:
         """List tasks."""
@@ -132,7 +133,7 @@ class TaskGetTool(ToolDef):
 
     name: ClassVar[str] = "TaskGet"
     description: ClassVar[str] = "Get full details of a task"
-    input_schema: ClassVar[type[ToolInput]] = TaskGetInput
+    input_schema: ClassVar[type] = TaskGetInput
 
     async def execute(self, input: TaskGetInput, ctx: ToolUseContext) -> ToolResult:
         """Get task."""

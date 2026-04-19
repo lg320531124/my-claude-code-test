@@ -1,5 +1,6 @@
 """Usage command - Detailed usage stats."""
 
+from __future__ import annotations
 import json
 from pathlib import Path
 from datetime import datetime

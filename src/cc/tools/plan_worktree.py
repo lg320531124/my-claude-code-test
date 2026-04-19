@@ -1,8 +1,9 @@
 """Plan and Worktree tools."""
 
+from __future__ import annotations
 import json
 from pathlib import Path
-from typing import ClassVar
+from typing import Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 from ..types.permission import PermissionResult, PermissionDecision
@@ -17,14 +18,14 @@ class EnterPlanModeInput(ToolInput):
 class ExitPlanModeInput(ToolInput):
     """Input for ExitPlanMode."""
 
-    allowedPrompts: list[dict] | None = None
+    allowedPrompts: Optional[List[dict]] = None
 
 
 class EnterWorktreeInput(ToolInput):
     """Input for EnterWorktree."""
 
-    name: str | None = None
-    path: str | None = None
+    name: Optional[str] = None
+    path: Optional[str] = None
 
 
 class ExitWorktreeInput(ToolInput):
@@ -42,7 +43,7 @@ class EnterPlanModeTool(ToolDef):
 
     name: ClassVar[str] = "EnterPlanMode"
     description: ClassVar[str] = "Enter planning mode to design implementation before executing"
-    input_schema: ClassVar[type[ToolInput]] = EnterPlanModeInput
+    input_schema: ClassVar[type] = EnterPlanModeInput
 
     async def execute(self, input: EnterPlanModeInput, ctx: ToolUseContext) -> ToolResult:
         """Enter plan mode."""
@@ -64,7 +65,7 @@ class ExitPlanModeTool(ToolDef):
 
     name: ClassVar[str] = "ExitPlanMode"
     description: ClassVar[str] = "Exit planning mode and proceed with implementation"
-    input_schema: ClassVar[type[ToolInput]] = ExitPlanModeInput
+    input_schema: ClassVar[type] = ExitPlanModeInput
 
     async def execute(self, input: ExitPlanModeInput, ctx: ToolUseContext) -> ToolResult:
         """Exit plan mode."""
@@ -94,7 +95,7 @@ class EnterWorktreeTool(ToolDef):
 
     name: ClassVar[str] = "EnterWorktree"
     description: ClassVar[str] = "Create and enter a git worktree for isolated work"
-    input_schema: ClassVar[type[ToolInput]] = EnterWorktreeInput
+    input_schema: ClassVar[type] = EnterWorktreeInput
 
     async def execute(self, input: EnterWorktreeInput, ctx: ToolUseContext) -> ToolResult:
         """Enter worktree."""
@@ -128,7 +129,7 @@ class ExitWorktreeTool(ToolDef):
 
     name: ClassVar[str] = "ExitWorktree"
     description: ClassVar[str] = "Exit and optionally remove git worktree"
-    input_schema: ClassVar[type[ToolInput]] = ExitWorktreeInput
+    input_schema: ClassVar[type] = ExitWorktreeInput
 
     async def execute(self, input: ExitWorktreeInput, ctx: ToolUseContext) -> ToolResult:
         """Exit worktree."""

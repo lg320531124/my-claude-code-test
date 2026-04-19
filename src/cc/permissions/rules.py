@@ -1,5 +1,6 @@
 """Permission rules - Define permission patterns."""
 
+from __future__ import annotations
 from typing import Callable
 
 from ..types.permission import PermissionDecision, PermissionRule
@@ -41,7 +42,7 @@ SAFE_BASH_PATTERNS = [
 ]
 
 
-def get_default_rules() -> list[PermissionRule]:
+def get_default_rules() -> List[PermissionRule]:
     """Get default permission rules."""
     rules = []
 
@@ -146,14 +147,14 @@ def _matches_subpattern(subpattern: str, input_dict: dict) -> bool:
 
     # For Bash tool
     if "command" in input_dict:
-        cmd = input_dict["command"]
+        cmd = input_Dict["command"]
         if subpattern.endswith("*"):
             return cmd.startswith(subpattern[:-1])
         return cmd == subpattern
 
     # For file tools
     if "file_path" in input_dict:
-        path = input_dict["file_path"]
+        path = input_Dict["file_path"]
         if subpattern.endswith("*"):
             return path.startswith(subpattern[:-1])
         return path == subpattern or path.endswith(subpattern)

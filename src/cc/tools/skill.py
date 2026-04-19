@@ -1,8 +1,9 @@
 """SkillTool - Execute skills."""
 
+from __future__ import annotations
 import json
 from pathlib import Path
-from typing import ClassVar
+from typing import Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -11,7 +12,7 @@ class SkillInput(ToolInput):
     """Input for SkillTool."""
 
     skill: str
-    args: str | None = None
+    args: Optional[str] = None
 
 
 class SkillTool(ToolDef):
@@ -19,7 +20,7 @@ class SkillTool(ToolDef):
 
     name: ClassVar[str] = "Skill"
     description: ClassVar[str] = "Execute a skill with optional arguments"
-    input_schema: ClassVar[type[ToolInput]] = SkillInput
+    input_schema: ClassVar[type] = SkillInput
 
     SKILLS_DIR = Path.home() / ".claude-code-py" / "skills"
 
@@ -369,7 +370,7 @@ project/
             "content": content,
         }
 
-    def _format_skill_result(self, parsed: dict, args: str | None, source: str) -> str:
+    def _format_skill_result(self, parsed: dict, args: Optional[str], source: str) -> str:
         """Format skill result."""
         result = f"# Skill: {parsed['name']}\n"
         result += f"Source: {source}\n"

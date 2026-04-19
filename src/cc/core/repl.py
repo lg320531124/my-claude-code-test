@@ -1,9 +1,10 @@
 """REPL implementation with streaming and progress."""
 
+from __future__ import annotations
 import asyncio
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 from rich.console import Console
 from rich.live import Live
@@ -31,7 +32,7 @@ class REPL:
         self,
         config: Config,
         session: Session,
-        on_command: Callable | None = None,
+        on_command: Optional[Callable, Optional] = None,
     ):
         self.config = config
         self.session = session
@@ -181,7 +182,7 @@ class REPL:
 def run_repl(
     config: Config,
     session: Session,
-    initial_prompt: str | None = None,
+    initial_prompt: Optional[str] = None,
 ) -> None:
     """Run REPL with optional initial prompt."""
     repl = REPL(config, session)

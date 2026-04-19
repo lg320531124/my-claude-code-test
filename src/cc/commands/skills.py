@@ -1,5 +1,6 @@
 """Skills command - Skill management."""
 
+from __future__ import annotations
 import json
 from pathlib import Path
 
@@ -10,7 +11,7 @@ from rich.table import Table
 SKILLS_DIR = Path.home() / ".claude-code-py" / "skills"
 
 
-def run_skills(console: Console, action: str = "list", name: str | None = None) -> None:
+def run_skills(console: Console, action: str = "list", name: Optional[str] = None) -> None:
     """Manage skills."""
     SKILLS_DIR.mkdir(parents=True, exist_ok=True)
 

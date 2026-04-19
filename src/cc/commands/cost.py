@@ -1,5 +1,6 @@
 """Cost command - Usage tracking."""
 
+from __future__ import annotations
 from rich.console import Console
 from rich.table import Table
 

@@ -1,6 +1,7 @@
 """AskUserQuestionTool - Interactive user questions."""
 
-from typing import ClassVar
+from __future__ import annotations
+from typing import Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -9,7 +10,7 @@ class QuestionOption(ToolInput):
     """Option for a question."""
 
     label: str
-    description: str | None = None
+    description: Optional[str] = None
 
 
 class Question(ToolInput):
@@ -17,14 +18,14 @@ class Question(ToolInput):
 
     question: str
     header: str = "Question"
-    options: list[QuestionOption] | None = None
+    options: Optional[List[QuestionOption]] = None
     multiSelect: bool = False
 
 
 class AskUserQuestionInput(ToolInput):
     """Input for AskUserQuestionTool."""
 
-    questions: list[Question]
+    questions: List[Question]
 
 
 class AskUserQuestionTool(ToolDef):
@@ -32,7 +33,7 @@ class AskUserQuestionTool(ToolDef):
 
     name: ClassVar[str] = "AskUserQuestion"
     description: ClassVar[str] = "Ask user questions to clarify requirements or get decisions"
-    input_schema: ClassVar[type[ToolInput]] = AskUserQuestionInput
+    input_schema: ClassVar[type] = AskUserQuestionInput
 
     async def execute(self, input: AskUserQuestionInput, ctx: ToolUseContext) -> ToolResult:
         """Execute the question tool."""

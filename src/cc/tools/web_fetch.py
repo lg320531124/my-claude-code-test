@@ -1,7 +1,8 @@
 """WebFetchTool - Fetch URL content."""
 
+from __future__ import annotations
 import httpx
-from typing import ClassVar
+from typing import Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -10,8 +11,8 @@ class WebFetchInput(ToolInput):
     """Input for WebFetchTool."""
 
     url: str
-    prompt: str | None = None
-    timeout_ms: int | None = None
+    prompt: Optional[str] = None
+    timeout_ms: Optional[int] = None
 
 
 class WebFetchTool(ToolDef):
@@ -19,7 +20,7 @@ class WebFetchTool(ToolDef):
 
     name: ClassVar[str] = "WebFetch"
     description: ClassVar[str] = "Fetch and extract content from a URL"
-    input_schema: ClassVar[type[ToolInput]] = WebFetchInput
+    input_schema: ClassVar[type] = WebFetchInput
 
     async def execute(self, input: WebFetchInput, ctx: ToolUseContext) -> ToolResult:
         """Fetch the URL."""

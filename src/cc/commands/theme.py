@@ -1,12 +1,13 @@
 """Theme command - UI theme management."""
 
+from __future__ import annotations
 from rich.console import Console
 from rich.prompt import Prompt
 
 from ..utils.config import Config
 
 
-def run_theme(console: Console, theme: str | None = None) -> None:
+def run_theme(console: Console, theme: Optional[str] = None) -> None:
     """Manage theme."""
     config = Config.load()
 
