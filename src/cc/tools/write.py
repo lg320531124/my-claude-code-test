@@ -14,6 +14,7 @@ Ported from TypeScript FileWriteTool.ts patterns:
 from __future__ import annotations
 import os
 import time
+import asyncio
 from pathlib import Path
 from typing import ClassVar, Dict, Any, Optional, List, Callable
 
@@ -22,6 +23,13 @@ from pydantic import BaseModel, Field
 from ..types.tool import Tool, ToolInput, ToolResult, ToolUseContext, ValidationResult
 from ..types.permission import PermissionResult, PermissionDecision
 from ..types.message import ToolResultBlock
+from ..utils.async_io import (
+    write_file_async,
+    read_file_async,
+    exists_async,
+    stat_async,
+    mkdir_async,
+)
 
 
 class WriteInput(ToolInput):
@@ -105,20 +113,22 @@ class WriteTool(Tool):
         full_path = expand_path(input_data.file_path)
         path = Path(full_path)
 
-        # Ensure parent directory exists
-        path.parent.mkdir(parents=True, exist_ok=True)
+        # Ensure parent directory exists (async)
+        await mkdir_async(path.parent, parents=True, exist_ok=True)
 
-        # Check if file exists and get original content
+        # Check if file exists and get original content (async)
         original_content = None
-        if path.exists():
+        file_exists = await exists_async(full_path)
+        if file_exists:
             # Check staleness
             last_read = context.read_file_state.get(full_path)
             if last_read:
-                current_mtime = path.stat().st_mtime
+                stat_result = await stat_async(full_path)
+                current_mtime = stat_result.st_mtime
                 if current_mtime > last_read.get("timestamp", 0):
                     # File was modified since last read
                     # Check if content unchanged (Windows timestamp issue)
-                    current_content = path.read_text(encoding="utf-8", errors="replace")
+                    current_content = await read_file_async(full_path, encoding="utf-8")
                     if current_content != last_read.get("content", ""):
                         return ToolResult(
                             data=WriteOutput(
@@ -129,11 +139,11 @@ class WriteTool(Tool):
                             is_error=True,
                             error_message=FILE_UNEXPECTEDLY_MODIFIED_ERROR,
                         )
-            original_content = path.read_text(encoding="utf-8", errors="replace")
+            original_content = await read_file_async(full_path, encoding="utf-8")
 
-        # Write content
+        # Write content (async)
         try:
-            path.write_text(input_data.content, encoding="utf-8")
+            await write_file_async(full_path, input_data.content, encoding="utf-8")
 
             # Calculate line changes
             old_lines = original_content.splitlines() if original_content else []
@@ -141,11 +151,12 @@ class WriteTool(Tool):
             lines_added = max(0, len(new_lines) - len(old_lines))
             lines_removed = max(0, len(old_lines) - len(new_lines))
 
-            # Update file state
+            # Update file state (async stat)
+            stat_result = await stat_async(full_path)
             if context.read_file_state:
                 context.read_file_state[full_path] = {
                     "content": input_data.content,
-                    "timestamp": path.stat().st_mtime,
+                    "timestamp": stat_result.st_mtime,
                     "offset": None,
                     "limit": None,
                 }

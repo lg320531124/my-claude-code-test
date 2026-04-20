@@ -57,6 +57,22 @@ from .json_tool import JSONTool, JSONInput
 from .xml import XMLTool, XMLInput
 from .regex import RegexTool, RegexInput, RegexMatch
 from .url import URLTool, URLInput, URLInfo
+# New async tools (Batch 3)
+from .task_output import TaskOutputTool, TaskOutputInput
+from .task_stop import TaskStopTool, TaskStopInput
+from .mcp_list import ListMcpResourcesTool as ListMcpResourcesToolNew
+from .mcp_read import ReadMcpResourceTool as ReadMcpResourceToolNew
+from .mcp_auth import McpAuthTool, McpAuthInput
+from .repl import REPLTool, REPLInput
+# Shared utilities
+from .shared import (
+    match_wildcard_pattern,
+    check_file_permission,
+    check_bash_permission,
+    execute_with_timeout,
+    execute_parallel,
+    ToolExecutor,
+)
 
 __all__ = [
     # Core tools
@@ -179,6 +195,22 @@ __all__ = [
     "URLTool",
     "URLInput",
     "URLInfo",
+    # New async tools (Batch 3)
+    "TaskOutputTool",
+    "TaskOutputInput",
+    "TaskStopTool",
+    "TaskStopInput",
+    "McpAuthTool",
+    "McpAuthInput",
+    "REPLTool",
+    "REPLInput",
+    # Shared utilities
+    "match_wildcard_pattern",
+    "check_file_permission",
+    "check_bash_permission",
+    "execute_with_timeout",
+    "execute_parallel",
+    "ToolExecutor",
     # Utility
     "get_default_tools",
     "get_all_tools",

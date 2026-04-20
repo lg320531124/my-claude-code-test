@@ -15,6 +15,7 @@ Ported from TypeScript FileEditTool.ts patterns:
 from __future__ import annotations
 import os
 import time
+import asyncio
 from pathlib import Path
 from typing import ClassVar, Dict, Any, Optional, List, Callable
 
@@ -23,6 +24,13 @@ from pydantic import BaseModel, Field
 from ..types.tool import Tool, ToolInput, ToolResult, ToolUseContext, ValidationResult
 from ..types.permission import PermissionResult, PermissionDecision
 from ..types.message import ToolResultBlock
+from ..utils.async_io import (
+    read_file_async,
+    write_file_async,
+    exists_async,
+    stat_async,
+    mkdir_async,
+)
 
 
 class EditInput(ToolInput):
@@ -139,19 +147,21 @@ class EditTool(Tool):
                 error_message="No changes to make: old_string and new_string are identical.",
             )
 
-        # Check if file exists
-        if not path.exists():
+        # Check if file exists (async)
+        file_exists = await exists_async(full_path)
+        if not file_exists:
             # Empty old_string on non-existent file means new file creation
             if input_data.old_string == "":
-                # Create new file
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(input_data.new_string, encoding="utf-8")
+                # Create new file (async)
+                await mkdir_async(path.parent, parents=True, exist_ok=True)
+                await write_file_async(full_path, input_data.new_string, encoding="utf-8")
 
-                # Update file state
+                # Update file state (async)
+                stat_result = await stat_async(full_path)
                 if context.read_file_state:
                     context.read_file_state[full_path] = {
                         "content": input_data.new_string,
-                        "timestamp": path.stat().st_mtime,
+                        "timestamp": stat_result.st_mtime,
                         "offset": None,
                         "limit": None,
                     }
@@ -167,7 +177,9 @@ class EditTool(Tool):
                 )
 
             # Find similar file
-            similar = find_similar_file(full_path, context.cwd)
+            similar = await asyncio.get_event_loop().run_in_executor(
+                None, lambda: find_similar_file(full_path, context.cwd)
+            )
             msg = f"File does not exist: {full_path}"
             if similar:
                 msg += f" Did you mean {similar}?"
@@ -196,14 +208,15 @@ class EditTool(Tool):
                 error_message="File is a Jupyter Notebook. Use NotebookEdit tool instead.",
             )
 
-        # Check staleness
+        # Check staleness (async)
         last_read = context.read_file_state.get(full_path)
         if last_read:
             try:
-                current_mtime = path.stat().st_mtime
+                stat_result = await stat_async(full_path)
+                current_mtime = stat_result.st_mtime
                 if current_mtime > last_read.get("timestamp", 0):
                     # Potential stale
-                    current_content = path.read_text(encoding="utf-8", errors="replace")
+                    current_content = await read_file_async(full_path, encoding="utf-8")
                     if current_content != last_read.get("content", ""):
                         return ToolResult(
                             data=EditOutput(
@@ -218,8 +231,8 @@ class EditTool(Tool):
             except OSError:
                 pass
 
-        # Read file
-        content = path.read_text(encoding="utf-8", errors="replace")
+        # Read file (async)
+        content = await read_file_async(full_path, encoding="utf-8")
 
         # Normalize line endings for comparison
         normalized_content = content.replace("\r\n", "\n")
@@ -276,14 +289,15 @@ class EditTool(Tool):
         # Preserve original line endings
         new_content = preserve_line_endings(content, new_content_normalized)
 
-        # Write back
-        path.write_text(new_content, encoding="utf-8")
+        # Write back (async)
+        await write_file_async(full_path, new_content, encoding="utf-8")
 
-        # Update file state
+        # Update file state (async)
+        stat_result = await stat_async(full_path)
         if context.read_file_state:
             context.read_file_state[full_path] = {
                 "content": new_content,
-                "timestamp": path.stat().st_mtime,
+                "timestamp": stat_result.st_mtime,
                 "offset": None,
                 "limit": None,
             }

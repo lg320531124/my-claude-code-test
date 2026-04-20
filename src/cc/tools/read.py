@@ -13,6 +13,7 @@ Ported from TypeScript FileReadTool/FileReadTool.ts patterns:
 """
 
 from __future__ import annotations
+import asyncio
 import base64
 import json
 import os
@@ -28,6 +29,7 @@ from pydantic import BaseModel, Field
 from ..types.tool import Tool, ToolDef, ToolInput, ToolResult, ToolUseContext, ValidationResult
 from ..types.permission import PermissionResult, PermissionDecision
 from ..types.message import ContentBlock, ToolResultBlock
+from ..utils.async_io import read_file_async, read_file_binary_async, stat_async, exists_async
 
 
 # Constants
@@ -416,11 +418,12 @@ class ReadTool(Tool):
         max_tokens: int,
         context: ToolUseContext,
     ) -> ToolResult:
-        """Read text file."""
+        """Read text file using async I/O."""
         path = Path(resolved_path)
 
-        # Check file size
-        file_size = path.stat().st_size
+        # Check file size (async)
+        stat_result = await stat_async(resolved_path)
+        file_size = stat_result.st_size
         if file_size > max_size_bytes and limit is None:
             return ToolResult(
                 data=ReadOutput(
@@ -430,10 +433,20 @@ class ReadTool(Tool):
                 is_error=True,
             )
 
-        # Read content
-        content = path.read_text(encoding="utf-8", errors="replace")
+        # Read content asynchronously
+        content = await read_file_async(
+            resolved_path,
+            encoding="utf-8",
+            limit=limit,
+            offset=offset,
+        )
+
+        # If no limit/offset, read full file
+        if limit is None and offset == 0:
+            content = await read_file_async(resolved_path, encoding="utf-8")
+
         lines = content.splitlines()
-        total_lines = len(lines)
+        total_lines = len(lines) if limit is None else len((await read_file_async(resolved_path)).splitlines())
 
         # Apply offset (0-indexed internally)
         line_offset = offset if offset == 0 else offset - 1
@@ -495,11 +508,11 @@ class ReadTool(Tool):
         max_tokens: int,
         context: ToolUseContext,
     ) -> ToolResult:
-        """Read image file."""
+        """Read image file using async I/O."""
         path = Path(resolved_path)
 
-        # Read binary data
-        data = path.read_bytes()
+        # Read binary data asynchronously
+        data = await read_file_binary_async(resolved_path)
         original_size = len(data)
 
         if original_size == 0:
@@ -541,11 +554,12 @@ class ReadTool(Tool):
         max_tokens: int,
         context: ToolUseContext,
     ) -> ToolResult:
-        """Read PDF file."""
+        """Read PDF file using async I/O."""
         path = Path(resolved_path)
 
-        # Check file size
-        file_size = path.stat().st_size
+        # Check file size asynchronously
+        stat_result = await stat_async(resolved_path)
+        file_size = stat_result.st_size
 
         # Parse page range if provided
         if pages:
@@ -570,8 +584,8 @@ class ReadTool(Tool):
                 )
 
         # Read PDF (simplified - in TypeScript uses pdf.js)
-        # For now, return metadata
-        data = path.read_bytes()
+        # For now, return metadata - using async binary read
+        data = await read_file_binary_async(resolved_path)
         base64_data = base64.b64encode(data).decode("utf-8")
 
         return ToolResult(
@@ -593,11 +607,12 @@ class ReadTool(Tool):
         max_tokens: int,
         context: ToolUseContext,
     ) -> ToolResult:
-        """Read Jupyter notebook."""
+        """Read Jupyter notebook using async I/O."""
         path = Path(resolved_path)
 
-        # Read and parse notebook
-        notebook_data = json.loads(path.read_text(encoding="utf-8"))
+        # Read and parse notebook asynchronously
+        notebook_content = await read_file_async(resolved_path, encoding="utf-8")
+        notebook_data = json.loads(notebook_content)
         cells = notebook_data.get("cells", [])
 
         # Check size

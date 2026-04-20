@@ -6,12 +6,15 @@ Ported from TypeScript Tool.ts patterns:
 - Progress tracking
 - Permission matching
 - Validation
+- Full asyncio support for all async operations
 """
 
 from __future__ import annotations
+import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Optional, Dict, List, Callable, Union
+from typing import Any, ClassVar, Optional, Dict, List, Callable, Union, Awaitable, AsyncIterator
 from dataclasses import dataclass, field
+from concurrent.futures import ThreadPoolExecutor
 
 from pydantic import BaseModel
 
@@ -283,6 +286,31 @@ class Tool(ABC):
         desc = schema.get("description", "")
         return f"- {self.name}: {desc}"
 
+    async def get_api_schema_async(self) -> Dict[str, Any]:
+        """Generate Anthropic API-compatible tool schema (async)."""
+        # Schema generation in thread pool for complex schemas
+        if hasattr(self.input_schema, 'model_json_schema'):
+            loop = asyncio.get_event_loop()
+            schema = await loop.run_in_executor(None, self.input_schema.model_json_schema)
+        else:
+            schema = self.input_json_schema or {"type": "object", "properties": {}}
+
+        return {
+            "name": self.name,
+            "description": getattr(self, 'description_text', self.name),
+            "input_schema": schema,
+        }
+
+    async def run_sync_in_executor(
+        self,
+        func: Callable,
+        *args,
+        **kwargs
+    ) -> Any:
+        """Run a synchronous function in thread pool."""
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
     def user_facing_name(self, input: Optional[Dict[str, Any]]) -> str:
         """Get user-facing name for tool."""
         return self.name
@@ -321,18 +349,29 @@ class Tool(ABC):
             content=str(content),
         )
 
-    def validate_input(
+    async def validate_input(
         self,
         input: Dict[str, Any],
         context: ToolUseContext,
     ) -> ValidationResult:
-        """Validate tool input."""
-        try:
-            # Use Pydantic validation
-            validated = self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
-            return ValidationResult(result=True)
-        except Exception as e:
-            return ValidationResult(result=False, message=str(e), error_code=400)
+        """Validate tool input (async version)."""
+        # Run Pydantic validation in thread pool for large inputs
+        if len(str(input)) > 10000:
+            loop = asyncio.get_event_loop()
+            try:
+                validated = await loop.run_in_executor(
+                    None,
+                    lambda: self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
+                )
+                return ValidationResult(result=True)
+            except Exception as e:
+                return ValidationResult(result=False, message=str(e), error_code=400)
+        else:
+            try:
+                validated = self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
+                return ValidationResult(result=True)
+            except Exception as e:
+                return ValidationResult(result=False, message=str(e), error_code=400)
 
     async def check_permissions(
         self,
@@ -538,4 +577,71 @@ __all__ = [
     "tool_matches_name",
     "find_tool_by_name",
     "TOOL_DEFAULTS",
+    # Async helpers
+    "execute_tools_parallel",
+    "execute_tool_with_timeout",
 ]
+
+
+# Async execution helpers
+async def execute_tools_parallel(
+    tools: List[Tool],
+    inputs: List[Dict[str, Any]],
+    context: ToolUseContext,
+    can_use_tool: Callable,
+    parent_message: Any,
+    on_progress: Optional[Callable] = None,
+) -> List[ToolResult]:
+    """Execute multiple tools in parallel using asyncio.gather.
+
+    Args:
+        tools: List of tools to execute
+        inputs: List of inputs for each tool
+        context: Tool context
+        can_use_tool: Permission check callback
+        parent_message: Parent message
+        on_progress: Progress callback
+
+    Returns:
+        List of ToolResults
+    """
+    tasks = [
+        tool.call(input, context, can_use_tool, parent_message, on_progress)
+        for tool, input in zip(tools, inputs)
+    ]
+    return await asyncio.gather(*tasks)
+
+
+async def execute_tool_with_timeout(
+    tool: Tool,
+    input: Dict[str, Any],
+    context: ToolUseContext,
+    can_use_tool: Callable,
+    parent_message: Any,
+    timeout: float = 30.0,
+    on_progress: Optional[Callable] = None,
+) -> ToolResult:
+    """Execute a tool with timeout.
+
+    Args:
+        tool: Tool to execute
+        input: Tool input
+        context: Tool context
+        can_use_tool: Permission check callback
+        parent_message: Parent message
+        timeout: Timeout in seconds
+        on_progress: Progress callback
+
+    Returns:
+        ToolResult or error result if timed out
+    """
+    try:
+        return await asyncio.wait_for(
+            tool.call(input, context, can_use_tool, parent_message, on_progress),
+            timeout=timeout
+        )
+    except asyncio.TimeoutError:
+        return ToolResult(
+            data=f"Tool {tool.name} timed out after {timeout} seconds",
+            is_error=True,
+        )
