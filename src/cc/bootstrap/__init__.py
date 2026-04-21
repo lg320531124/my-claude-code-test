@@ -35,6 +35,24 @@ from .state import (
     SessionState,
     get_state,
 )
+from .setup import (
+    SetupConfig,
+    WorktreeSession,
+    setup,
+    check_python_version,
+    is_bare_mode,
+    is_env_truthy,
+    create_worktree_for_session,
+    generate_tmux_session_name,
+    create_tmux_session_for_worktree,
+    init_session_memory,
+    init_background_jobs,
+    prefetch_api_key,
+    check_for_release_notes,
+    get_global_config,
+    get_current_project_config,
+    log_event,
+)
 
 __all__ = [
     # Session ID
@@ -73,4 +91,21 @@ __all__ = [
     # State class
     "SessionState",
     "get_state",
+    # Setup
+    "SetupConfig",
+    "WorktreeSession",
+    "setup",
+    "check_python_version",
+    "is_bare_mode",
+    "is_env_truthy",
+    "create_worktree_for_session",
+    "generate_tmux_session_name",
+    "create_tmux_session_for_worktree",
+    "init_session_memory",
+    "init_background_jobs",
+    "prefetch_api_key",
+    "check_for_release_notes",
+    "get_global_config",
+    "get_current_project_config",
+    "log_event",
 ]
