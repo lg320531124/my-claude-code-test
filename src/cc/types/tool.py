@@ -391,7 +391,7 @@ class Tool(ABC):
         if len(str(input)) > 10000:
             loop = asyncio.get_event_loop()
             try:
-                validated = await loop.run_in_executor(
+                await loop.run_in_executor(
                     None,
                     lambda: self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
                 )
@@ -400,7 +400,7 @@ class Tool(ABC):
                 return ValidationResult(result=False, message=str(e), error_code=400)
         else:
             try:
-                validated = self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
+                self.input_schema.model_validate(input) if hasattr(self.input_schema, 'model_validate') else input
                 return ValidationResult(result=True)
             except Exception as e:
                 return ValidationResult(result=False, message=str(e), error_code=400)

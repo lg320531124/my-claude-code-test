@@ -90,7 +90,7 @@ class OutputHandler:
         )
 
         # Format content
-        formatted = await self._format_content(chunk)
+        await self._format_content(chunk)
 
         # Buffer
         self._buffer.append(chunk)

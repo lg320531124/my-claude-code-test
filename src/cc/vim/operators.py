@@ -295,7 +295,7 @@ class VimOperators:
         else:
             new_line = current_line + next_line
 
-        new_lines = ctx.lines[:line] + [new_line] + ctx.lines[line + 2:]
+        ctx.lines[:line] + [new_line] + ctx.lines[line + 2:]
 
         return OperatorResult(
             text='\n',
@@ -316,7 +316,7 @@ class VimOperators:
         join_col = len(current_line)
         new_line = current_line + next_line
 
-        new_lines = ctx.lines[:line] + [new_line] + ctx.lines[line + 2:]
+        ctx.lines[:line] + [new_line] + ctx.lines[line + 2:]
 
         return OperatorResult(
             text='\n',

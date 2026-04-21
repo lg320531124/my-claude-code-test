@@ -506,7 +506,7 @@ class ReadTool(Tool):
         context: ToolUseContext,
     ) -> ToolResult:
         """Read image file using async I/O."""
-        path = Path(resolved_path)
+        Path(resolved_path)
 
         # Read binary data asynchronously
         data = await read_file_binary_async(resolved_path)
@@ -552,7 +552,7 @@ class ReadTool(Tool):
         context: ToolUseContext,
     ) -> ToolResult:
         """Read PDF file using async I/O."""
-        path = Path(resolved_path)
+        Path(resolved_path)
 
         # Check file size asynchronously
         stat_result = await stat_async(resolved_path)
@@ -752,7 +752,7 @@ class ReadTool(Tool):
         context: ToolUseContext,
     ) -> PermissionResult:
         """Check tool permissions."""
-        file_path = expand_path(input.get("file_path", ""))
+        expand_path(input.get("file_path", ""))
 
         # Check if file is in deny list (simplified)
         # In TypeScript, uses checkReadPermissionForTool

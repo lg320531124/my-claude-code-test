@@ -513,7 +513,7 @@ class QueryEngine:
             else:
                 # Try to get running loop, create Event if available
                 try:
-                    loop = asyncio.get_running_loop()
+                    asyncio.get_running_loop()
                     self._abort_controller = asyncio.Event()
                 except RuntimeError:
                     # No running loop, use a placeholder that will be replaced

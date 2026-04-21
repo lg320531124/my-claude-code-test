@@ -31,9 +31,12 @@ except ImportError:
     TokenManager = None
     get_client = None
     detect_provider_from_url = None
-    is_env_truthy = lambda x: False
-    load_settings = lambda: {}
-    save_settings = lambda x: None
+    def is_env_truthy(x):
+        return False
+    def load_settings():
+        return {}
+    def save_settings(x):
+        return None
 
 __all__ = [
     "APIClient",

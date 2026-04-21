@@ -77,7 +77,7 @@ class MCPClient:
     async def _initialize(self) -> None:
         """Initialize MCP protocol."""
         # Send initialize request
-        response = await self._send_request("initialize", {
+        await self._send_request("initialize", {
             "protocolVersion": "2024-11-05",
             "capabilities": {
                 "tools": {},

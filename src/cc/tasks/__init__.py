@@ -438,9 +438,9 @@ class TaskManager:
 
                 try:
                     if asyncio.iscoroutinefunction(task.handler):
-                        result = await task.handler(task)
+                        await task.handler(task)
                     else:
-                        result = task.handler(task)
+                        task.handler(task)
 
                     await self.complete(task.id)
 

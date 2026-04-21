@@ -415,7 +415,7 @@ class MainScreen(Screen):
         """Run query and stream response."""
         ctx = self.session.get_context()
         response_text = ""
-        start_time = time.time()
+        time.time()
 
         try:
             async for chunk in self.engine.query(text, ctx):

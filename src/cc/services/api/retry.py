@@ -197,7 +197,7 @@ class AdaptiveRetry(RetryHandler):
             return
 
         # Calculate average success time
-        avg_success = sum(self._success_times[-10:]) / len(self._success_times[-10:])
+        sum(self._success_times[-10:]) / len(self._success_times[-10:])
 
         # Adjust delay based on success rate
         recent_success = len([t for t in self._success_times[-10:] if t < 5])

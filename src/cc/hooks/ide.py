@@ -228,9 +228,9 @@ class IDEHooks:
     async def on_diagnostic(self, diagnostic: Dict[str, Any]) -> None:
         """Hook on diagnostic."""
         # Handle new diagnostic from IDE
-        path = Path(diagnostic.get("path", ""))
-        line = diagnostic.get("line", 0)
-        message = diagnostic.get("message", "")
+        Path(diagnostic.get("path", ""))
+        diagnostic.get("line", 0)
+        diagnostic.get("message", "")
 
         # Could trigger automated fixes
         pass

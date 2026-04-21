@@ -156,7 +156,7 @@ class OAuthService:
             return state.token
 
         config = self._provider_configs.get(state.provider, {})
-        token_url = config.get("token_url", "")
+        config.get("token_url", "")
 
         # Simulate token exchange (in real implementation, would use httpx)
         # For now, create a mock token

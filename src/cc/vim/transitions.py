@@ -420,13 +420,13 @@ class VimTransitions:
             # Operator in visual mode - operates on selection
             if key in self.operators.OPERATOR_REGISTRY:
                 # Create motion result from visual selection
-                visual_result = MotionResult(
+                MotionResult(
                     start=self.state.visual_start or self.state.cursor_pos,
                     end=self.state.visual_end or self.state.cursor_pos,
                     linewise=(self.state.mode == VimMode.VISUAL_LINE),
                 )
 
-                operator_func = self.operators.OPERATOR_REGISTRY[key]
+                self.operators.OPERATOR_REGISTRY[key]
                 # Execute operator
                 return TransitionResult(
                     new_mode=VimMode.NORMAL,

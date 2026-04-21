@@ -120,7 +120,7 @@ class ProcessTool(ToolDef):
             "INT": signal.SIGINT,
         }
 
-        sig = signals.get(signal_name.upper(), signal.SIGTERM)
+        signals.get(signal_name.upper(), signal.SIGTERM)
 
         try:
             # Check if it's a background process we manage

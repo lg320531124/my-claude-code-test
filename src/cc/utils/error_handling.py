@@ -252,7 +252,7 @@ def error_handler(
                     if attempts <= retry_count:
                         await asyncio.sleep(retry_delay * attempts)
                     else:
-                        error_info = handler.handle(
+                        handler.handle(
                             e,
                             category,
                             severity,

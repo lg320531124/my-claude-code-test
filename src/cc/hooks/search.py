@@ -70,7 +70,7 @@ class SearchHook:
         result = SearchResult(query=query)
 
         if not case_sensitive:
-            query_lower = query.lower()
+            query.lower()
 
         for path in paths:
             path_obj = Path(path)

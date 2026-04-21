@@ -415,8 +415,6 @@ class BashTool(Tool):
         timeout_ms = input_data.timeout or DEFAULT_TIMEOUT_MS
         timeout_secs = timeout_ms / 1000
 
-        stdout_accumulator = []
-        stderr_accumulator = []
         was_interrupted = False
         exit_code = 0
 
@@ -478,7 +476,7 @@ class BashTool(Tool):
         stdout = self._extract_claude_code_hints(stdout, input_data.command)
 
         # Determine command type for UI
-        is_search_read = is_search_or_read_bash_command(input_data.command)
+        is_search_or_read_bash_command(input_data.command)
         no_output_expected = is_silent_bash_command(input_data.command)
 
         output = BashOutput(

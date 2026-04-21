@@ -146,7 +146,7 @@ class StepProgress(Widget):
         lines = []
         for i, step in enumerate(self.steps):
             name = step.get("name", "")
-            status = step.get("status", "pending")
+            step.get("status", "pending")
 
             if i < self.current_step:
                 lines.append(f"[green]✓ {name}[/]")

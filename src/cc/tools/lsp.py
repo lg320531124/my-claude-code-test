@@ -389,7 +389,7 @@ Actions:
         lines = []
         for item in items[:50]:  # Limit
             label = item.get("label", "")
-            kind = item.get("kind", 0)
+            item.get("kind", 0)
             detail = item.get("detail", "")
             lines.append(f"{label} - {detail}")
 
@@ -403,7 +403,7 @@ Actions:
         lines = []
         for sym in symbols:
             name = sym.get("name", "")
-            kind = sym.get("kind", 0)
+            sym.get("kind", 0)
             range = sym.get("range", {})
             start = range.get("start", {})
             line = start.get("line", 0) + 1

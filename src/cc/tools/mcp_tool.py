@@ -46,7 +46,7 @@ class MCPTool(ToolDef):
                 is_error=True,
             )
 
-        server_config = servers[server_name]
+        servers[server_name]
 
         # Simplified: placeholder for actual MCP protocol communication
         # Full implementation would use MCP SDK to communicate with server

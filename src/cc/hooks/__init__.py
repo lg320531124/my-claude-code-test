@@ -392,7 +392,7 @@ async def use_voice_integration() -> Dict[str, Any]:
     async def start_listening() -> None:
         from ..services.voice import VoiceService
 
-        service = VoiceService()
+        VoiceService()
         voice_state["listening"] = True
         # Would start actual listening
 

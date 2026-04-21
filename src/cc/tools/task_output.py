@@ -40,8 +40,8 @@ class TaskOutputTool(ToolDef):
     ) -> ToolResult:
         """Get task output."""
         task_id = args.get("task_id", "")
-        block = args.get("block", True)
-        timeout = args.get("timeout", 30000)
+        args.get("block", True)
+        args.get("timeout", 30000)
         
         if not task_id:
             return ToolResult(data="Error: task_id is required")

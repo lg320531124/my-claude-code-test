@@ -70,7 +70,6 @@ class SummaryCompactor:
             return ""
 
         # Extract key information
-        topics = []
         decisions = []
         actions = []
 

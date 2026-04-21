@@ -507,7 +507,6 @@ class APIClient:
 
                         # Parse SSE stream (matching claude.ts patterns)
                         current_message_id: Optional[str] = None
-                        current_content_index: int = 0
                         tool_input_buffer: str = ""
                         current_tool_name: Optional[str] = None
                         current_tool_id: Optional[str] = None
@@ -548,7 +547,6 @@ class APIClient:
                                 index = event_data.get("index", 0)
                                 block = event_data.get("content_block", {})
                                 block_type = block.get("type", "")
-                                current_content_index = index
 
                                 if block_type == "text":
                                     yield StreamEvent(

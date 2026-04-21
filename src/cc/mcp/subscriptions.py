@@ -56,7 +56,7 @@ class SubscriptionManager:
         """Get or create update queue."""
         if self._update_queue is None:
             try:
-                loop = asyncio.get_running_loop()
+                asyncio.get_running_loop()
                 self._update_queue = asyncio.Queue()
             except RuntimeError:
                 # No running loop - will be initialized when async context is available
@@ -225,7 +225,6 @@ class SubscriptionManager:
         timeout: float = 30.0,
     ) -> ResourceUpdate | None:
         """Wait for a specific resource update."""
-        updates_seen = []
 
         # Create a temporary queue
         temp_queue: asyncio.Queue = asyncio.Queue()

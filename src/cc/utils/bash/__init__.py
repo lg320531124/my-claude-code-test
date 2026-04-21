@@ -91,7 +91,7 @@ class BashSandbox:
         if not cmd_parts:
             return False
 
-        base_cmd = cmd_parts[0]
+        cmd_parts[0]
 
         # Check dangerous
         for dangerous in self.config.blocked_commands:

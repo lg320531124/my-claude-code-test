@@ -44,7 +44,7 @@ class AsyncCache:
         """Get lock, creating lazily."""
         if self._lock is None:
             try:
-                loop = asyncio.get_running_loop()
+                asyncio.get_running_loop()
                 self._lock = asyncio.Lock()
             except RuntimeError:
                 self._lock = asyncio.Lock()
@@ -218,7 +218,7 @@ class ParallelExecutor:
         """Get semaphore, creating lazily."""
         if self._semaphore is None:
             try:
-                loop = asyncio.get_running_loop()
+                asyncio.get_running_loop()
                 self._semaphore = asyncio.Semaphore(self.max_concurrent)
             except RuntimeError:
                 self._semaphore = asyncio.Semaphore(self.max_concurrent)
@@ -308,7 +308,7 @@ class RateLimiter:
         """Get lock, creating lazily."""
         if self._lock is None:
             try:
-                loop = asyncio.get_running_loop()
+                asyncio.get_running_loop()
                 self._lock = asyncio.Lock()
             except RuntimeError:
                 self._lock = asyncio.Lock()

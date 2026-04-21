@@ -34,7 +34,7 @@ class MemoryExtractionService:
 
         for msg in messages:
             content = str(msg.get("content", ""))
-            role = msg.get("role", "")
+            msg.get("role", "")
 
             # Look for decision patterns
             decision_patterns = [

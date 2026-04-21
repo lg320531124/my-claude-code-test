@@ -109,7 +109,6 @@ class REPL:
 
         # Stream response
         response_text = ""
-        tool_calls = []
 
         console.print()
 
@@ -142,7 +141,7 @@ class REPL:
 
                         elif chunk_type == "retry":
                             attempt = chunk.get("attempt", 0)
-                            delay = chunk.get("delay", 1)
+                            chunk.get("delay", 1)
                             progress.update(task, description=f"Retrying ({attempt})...")
 
                         elif chunk_type == "error":

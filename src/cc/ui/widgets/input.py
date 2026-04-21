@@ -251,7 +251,7 @@ class InputWidget:
             text = "*" * len(text)
 
         # Show cursor position
-        display = text[:self._state.cursor_pos] + "█" + text[self._state.cursor_pos:]
+        text[:self._state.cursor_pos] + "█" + text[self._state.cursor_pos:]
 
         # Placeholder implementation - would use terminal rendering
         pass

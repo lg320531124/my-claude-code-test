@@ -57,7 +57,7 @@ class VoiceService:
         language: Optional[str] = None,
     ) -> TranscriptionResult:
         """Transcribe audio to text."""
-        client = await self._get_client()
+        await self._get_client()
 
         # Placeholder - would use actual STT API
         # Anthropic doesn't have public STT, would use:
@@ -101,7 +101,7 @@ class VoiceService:
         config: Optional[SpeechConfig] = None,
     ) -> bytes:
         """Synthesize text to speech."""
-        speech_config = config or SpeechConfig()
+        config or SpeechConfig()
 
         # Placeholder - would use actual TTS API
         # Options: ElevenLabs, Google TTS, Azure Speech, OpenAI TTS

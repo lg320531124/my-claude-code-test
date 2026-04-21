@@ -113,7 +113,7 @@ class AutoDreamService:
 
     def _generate_content(self, context: DreamContext, type: DreamType) -> str:
         """Generate dream content."""
-        patterns = self._patterns.get(
+        self._patterns.get(
             "problem_analysis" if type == DreamType.PLAN else
             "solution_generation" if type == DreamType.SOLUTION else
             "improvement_analysis",

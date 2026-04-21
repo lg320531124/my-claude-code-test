@@ -221,7 +221,7 @@ class RateLimiter:
 
             try:
                 await self.wait_for_slot()
-                result = await processor(request)
+                await processor(request)
                 await self.release()
 
             except Exception as e:

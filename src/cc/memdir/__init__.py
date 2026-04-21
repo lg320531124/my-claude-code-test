@@ -156,7 +156,7 @@ class MemDirService:
             if memory_id not in self._memories:
                 return False
 
-            memory = self._memories.pop(memory_id)
+            self._memories.pop(memory_id)
 
             # Remove from teams
             for team in self._teams.values():

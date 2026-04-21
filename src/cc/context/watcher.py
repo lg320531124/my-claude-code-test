@@ -230,7 +230,7 @@ class ContextUpdater:
         self.last_update = time.time()
 
         # Collect new context
-        changes = list(self._pending_updates)
+        list(self._pending_updates)
         self._pending_updates.clear()
 
         # Could trigger context refresh

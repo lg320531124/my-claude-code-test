@@ -131,7 +131,7 @@ class NotificationHook:
             True if dismissed
         """
         if notification_id in self._notifications:
-            notification = self._notifications.pop(notification_id)
+            self._notifications.pop(notification_id)
 
             # Notify subscribers of dismiss
             for subscriber in self._subscribers:

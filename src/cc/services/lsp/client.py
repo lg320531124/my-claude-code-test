@@ -237,7 +237,7 @@ class LSPClient:
         """Get diagnostics for file."""
         # Diagnostics are usually sent as notifications
         # This method returns cached diagnostics
-        uri = Path(file_path).as_uri()
+        Path(file_path).as_uri()
         # Placeholder - would need to track incoming diagnostics
         return []
 

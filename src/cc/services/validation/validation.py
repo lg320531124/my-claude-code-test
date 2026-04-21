@@ -150,7 +150,7 @@ class ValidationService:
             return ValidationResult(valid=False, errors=["Path must be string"])
 
         try:
-            path = Path(value)
+            Path(value)
             # Check if path has valid characters
             if not value:
                 return ValidationResult(valid=False, errors=["Path cannot be empty"])

@@ -30,7 +30,7 @@ class TaskStopTool(ToolDef):
     ) -> ToolResult:
         """Stop task."""
         task_id = args.get("task_id", "")
-        force = args.get("force", False)
+        args.get("force", False)
         
         if not task_id:
             return ToolResult(data="Error: task_id is required")

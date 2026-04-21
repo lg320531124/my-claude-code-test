@@ -144,7 +144,7 @@ async def clear_old_sessions_async(console: Console, days: int = 30) -> int:
 
 def run_sessions(console: Console, action: str = "list", args: List[str] = []) -> None:
     """Run sessions command."""
-    cwd = Path.cwd()
+    Path.cwd()
 
     if action == "list":
         asyncio.run(list_sessions_async(console))

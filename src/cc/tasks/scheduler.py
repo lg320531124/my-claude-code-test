@@ -153,7 +153,7 @@ class TaskScheduler:
         if task_id not in self._scheduled:
             return False
 
-        scheduled = self._scheduled.pop(task_id)
+        self._scheduled.pop(task_id)
 
         # Cancel running task if any
         if task_id in self._running:
@@ -255,9 +255,9 @@ class TaskScheduler:
             # Execute handler if exists
             if task.handler:
                 if asyncio.iscoroutinefunction(task.handler):
-                    result = await task.handler(task)
+                    await task.handler(task)
                 else:
-                    result = task.handler(task)
+                    task.handler(task)
 
             # Complete task
             await self.manager.complete(task_id)

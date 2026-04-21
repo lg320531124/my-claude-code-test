@@ -126,7 +126,7 @@ class TeamDeleteTool(ToolDef):
         """Delete team."""
         from ..memdir import get_memdir_service
 
-        service = get_memdir_service()
+        get_memdir_service()
         # Would implement deletion logic
         return ToolResult(content="Team deletion requires admin privileges")
 

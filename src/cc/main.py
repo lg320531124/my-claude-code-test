@@ -343,7 +343,7 @@ def permission(pattern: Optional[str], allow: bool, deny: bool, ask: bool, remov
 @click.pass_context
 def commit(ctx: click.Context, message: Optional[str]) -> None:
     """Create a git commit."""
-    config: Config = ctx.obj["config"]
+    ctx.obj["config"]
     console.print("[yellow]Commit feature coming soon[/yellow]")
 
 
