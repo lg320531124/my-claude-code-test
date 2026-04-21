@@ -1,7 +1,7 @@
 """CLI entry point for Claude Code Python."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import Optional
 import asyncio
 import os
 from pathlib import Path

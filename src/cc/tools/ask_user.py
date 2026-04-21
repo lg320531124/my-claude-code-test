@@ -1,7 +1,7 @@
 """AskUserQuestionTool - Interactive user questions."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable, Optional, ClassVar
+from typing import List, Optional, ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

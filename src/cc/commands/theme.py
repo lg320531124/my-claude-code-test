@@ -1,7 +1,7 @@
 """Theme command - UI theme management."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import Optional
 from rich.console import Console
 from rich.prompt import Prompt
 

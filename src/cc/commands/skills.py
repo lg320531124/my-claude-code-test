@@ -1,7 +1,7 @@
 """Skills command - Skill management."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import Optional
 from pathlib import Path
 
 from rich.console import Console

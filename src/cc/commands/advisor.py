@@ -4,7 +4,7 @@ from __future__ import annotations
 import click
 from rich.console import Console
 from rich.panel import Panel
-from typing import List, Dict
+from typing import List
 
 console = Console()
 

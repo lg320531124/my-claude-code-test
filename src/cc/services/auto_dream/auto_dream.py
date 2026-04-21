@@ -1,7 +1,7 @@
 """Auto Dream Service - Automatic dream/plan generation."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import List, Dict
 import json
 import time
 from dataclasses import dataclass, field

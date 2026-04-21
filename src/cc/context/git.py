@@ -1,7 +1,7 @@
 """Git context collection."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import List
 import subprocess
 from pathlib import Path
 

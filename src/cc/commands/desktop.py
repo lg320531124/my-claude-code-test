@@ -1,7 +1,7 @@
 """Desktop Command - Desktop application integration."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import Optional
 import click
 from rich.console import Console
 from rich.table import Table

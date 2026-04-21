@@ -1,7 +1,7 @@
 """Permission manager."""
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Any, Callable
+from typing import Optional
 from ..types.permission import PermissionConfig, PermissionResult, PermissionDecision
 
 
