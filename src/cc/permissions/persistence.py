@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import ClassVar
+from typing import Dict, List, ClassVar, Optional
 
 from ..types.permission import PermissionDecision
 

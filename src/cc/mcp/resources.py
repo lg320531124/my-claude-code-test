@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import json
 import time
-from typing import Any, Optional
+from typing import Dict, List, Any, Optional
 
 from .client import MCPConnection
 

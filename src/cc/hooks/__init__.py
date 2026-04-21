@@ -10,6 +10,10 @@ from typing import Any, Callable, Optional, Dict, List, AsyncIterator
 from dataclasses import dataclass, field
 from enum import Enum
 
+# Import hook types from services
+from ..services.hooks.hooks_system import HookType, HookContext, HookResult, get_hook_manager
+from .advanced import HookResult as AdvancedHookResult
+
 # Import new hook modules
 from .permissions import (
     PermissionAction,

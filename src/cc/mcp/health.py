@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import time
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Dict, List, Callable, Optional
 from dataclasses import dataclass
 from enum import Enum
 

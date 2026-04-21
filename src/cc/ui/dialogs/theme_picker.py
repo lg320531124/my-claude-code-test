@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import List, Dict, Optional, Any, Callable
 from dataclasses import dataclass
 from textual.widget import Widget
-from textual.widgets import Static, ListView, ListItem
+from textual.widgets import Static, ListView, ListItem, Label
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen

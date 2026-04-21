@@ -5,10 +5,10 @@ Ported from TypeScript types/permissions.ts patterns:
 - PermissionMode enum
 - Permission rules by source
 - ToolPermissionContext
-import time
 """
 
 from __future__ import annotations
+import time
 
 from enum import Enum
 from typing import Optional, List, Dict, Any, Set
