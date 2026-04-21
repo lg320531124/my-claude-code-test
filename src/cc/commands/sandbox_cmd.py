@@ -177,7 +177,7 @@ class SandboxCommand:
 
         # Recreate executor
         config = info.config
-        executor = SandboxExecutor(config)
+        executor = BashSandbox(config)
         self._executors[sandbox_id] = executor
 
         info.status = SandboxStatus.ACTIVE

@@ -68,7 +68,7 @@ async def disconnect_mcp_async(console: Console, server_name: str) -> None:
 
 async def reload_mcp_async(console: Console) -> None:
     """Reload MCP configuration."""
-    from ..mcp import get_mcp_manager
+    from ..mcp import get_mcp_manager, show_mcp_status
 
     manager = get_mcp_manager()
 

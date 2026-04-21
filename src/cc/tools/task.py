@@ -5,6 +5,7 @@ from typing import List, Dict, Optional, Any, Callable, Optional, ClassVar
 from datetime import datetime
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
+import json
 
 
 class TaskCreateInput(ToolInput):
