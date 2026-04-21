@@ -1,6 +1,7 @@
 """Memory command - Persistent memory management."""
 
 from __future__ import annotations
+from typing import List, Dict, Optional, Any, Callable
 from datetime import datetime
 from pathlib import Path
 

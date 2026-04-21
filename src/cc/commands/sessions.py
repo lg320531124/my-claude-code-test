@@ -1,6 +1,7 @@
 """Sessions command - Manage saved sessions."""
 
 from __future__ import annotations
+from typing import List, Dict, Optional, Any, Callable
 import asyncio
 import time
 from pathlib import Path
