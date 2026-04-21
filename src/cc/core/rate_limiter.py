@@ -41,7 +41,7 @@ class LimitState:
 @dataclass
 class RateLimitConfig:
     """Rate limiter configuration."""
-    limits: RateLimit = RateLimit()
+    limits: RateLimit = field(default_factory=RateLimit)
     auto_reset: bool = True
     reset_interval: float = 60.0
     queue_size: int = 100

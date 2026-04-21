@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 import asyncio
-import audioop
 import wave
 import io
-from typing import AsyncIterator, Optional, Callable, List
+import struct
+from typing import AsyncIterator, Optional, Callable, List, Dict
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -16,6 +16,36 @@ class AudioFormat(Enum):
     WAV = "wav"
     FLAC = "flac"
     MP3 = "mp3"
+
+
+def calculate_rms(data: bytes, sample_width: int = 2) -> int:
+    """Calculate RMS (Root Mean Square) of audio data.
+
+    Replaces audioop.rms which was removed in Python 3.13.
+    """
+    if not data or len(data) < sample_width:
+        return 0
+
+    try:
+        # Calculate number of samples
+        num_samples = len(data) // sample_width
+
+        # Unpack samples (assuming 16-bit signed integers)
+        if sample_width == 2:
+            samples = struct.unpack(f"<{num_samples}h", data)
+        elif sample_width == 1:
+            samples = struct.unpack(f"<{num_samples}B", data)
+            # Convert unsigned to signed-ish range for RMS calculation
+            samples = tuple(s - 128 for s in samples)
+        else:
+            return 0
+
+        # Calculate RMS
+        sum_squares = sum(s * s for s in samples)
+        rms = int((sum_squares / num_samples) ** 0.5)
+        return rms
+    except Exception:
+        return 0
 
 
 @dataclass
@@ -131,7 +161,7 @@ class VoiceStreamProcessor:
     def _calculate_energy(self, data: bytes) -> int:
         """Calculate audio energy."""
         try:
-            return audioop.rms(data, 2)  # 16-bit samples
+            return calculate_rms(data, 2)  # 16-bit samples
         except Exception:
             return 0
 
@@ -189,7 +219,7 @@ class VoiceActivityDetector:
     def is_speech(self, audio_chunk: bytes) -> bool:
         """Check if chunk contains speech."""
         try:
-            energy = audioop.rms(audio_chunk, 2)
+            energy = calculate_rms(audio_chunk, 2)
             self._history.append(energy)
 
             if len(self._history) > self._history_size:
