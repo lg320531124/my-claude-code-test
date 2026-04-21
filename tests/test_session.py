@@ -92,5 +92,5 @@ def test_session_from_dict():
 
     session = Session.from_dict(data)
     assert session.session_id == "test-123"
-    assert session.cwd == "/tmp"
+    assert str(session.cwd) == "/tmp"  # cwd is Path, compare as string
     assert len(session.messages) == 1

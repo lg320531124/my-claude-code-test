@@ -1,5 +1,212 @@
 # API Reference
 
+## Async IO Utilities
+
+### Async File Operations
+
+```python
+from cc.utils.async_io import (
+    read_file_async,
+    write_file_async,
+    exists_async,
+    stat_async,
+    mkdir_async,
+)
+
+# Async file read
+content = await read_file_async("/path/to/file")
+
+# Async file write
+await write_file_async("/path/to/file", "content")
+
+# Check file existence
+if await exists_async("/path/to/file"):
+    stat = await stat_async("/path/to/file")
+    print(f"Size: {stat.st_size}")
+```
+
+### Async Process Execution
+
+```python
+from cc.utils.async_process import (
+    run_command_async,
+    run_command_streaming,
+    run_commands_parallel,
+    ProcessResult,
+)
+
+# Single command
+result = await run_command_async("ls -la")
+print(result.stdout)
+
+# Streaming output
+async for line in run_command_streaming("tail -f log.txt"):
+    print(line)
+
+# Parallel execution
+results = await run_commands_parallel([
+    "git status",
+    "npm test",
+    "python -m pytest",
+])
+```
+
+### Async HTTP Client
+
+```python
+from cc.utils.async_http import AsyncHTTPClient, fetch_sse_stream
+
+# HTTP client
+client = AsyncHTTPClient(timeout=30.0)
+await client.connect()
+
+response = await client.get("https://api.example.com/data")
+data = response.json()
+
+# SSE streaming
+async for chunk in fetch_sse_stream(url, headers):
+    yield chunk
+```
+
+## Token Estimation
+
+```python
+from cc.services.token_estimation import (
+    estimate_tokens,
+    estimate_message_tokens,
+    TokenCounter,
+    TokenBudgetManager,
+)
+
+# Estimate tokens
+tokens = await estimate_tokens("Hello world")
+
+# Message token estimation
+usage = await estimate_message_tokens(message)
+
+# Token counter with cache
+counter = TokenCounter()
+tokens = await counter.count("large content")
+
+# Budget manager
+manager = TokenBudgetManager()
+if manager.can_add_input(5000):
+    manager.add_usage(usage)
+```
+
+## MCP Client
+
+```python
+from cc.services.mcp import MCPClient, MCPServerConfig
+
+config = MCPServerConfig(
+    name="my-server",
+    command="node",
+    args=["server.js"],
+    timeout=30.0,
+)
+
+client = MCPClient(config)
+await client.connect()
+
+# Discover tools
+tools = client.get_tools()
+
+# Call tool
+result = await client.call_tool("my_tool", {"arg": "value"})
+```
+
+## LSP Client
+
+```python
+from cc.services.lsp import LSPClient, LSPServerConfig
+
+config = LSPServerConfig(
+    language="python",
+    command="pyright",
+    args=["--stdio"],
+)
+
+client = LSPClient(config, root_path="/project")
+await client.connect()
+
+# Get completions
+completions = await client.get_completions("file.py", line=10, character=5)
+
+# Get hover info
+hover = await client.get_hover("file.py", line=10, character=5)
+```
+
+## Streaming Utilities
+
+```python
+from cc.core.streaming import SSEParser, StreamBuffer, ToolCallBuffer
+
+# SSE parser
+parser = SSEParser()
+event = parser.parse_event(raw_event)
+
+# Stream buffer
+buffer = StreamBuffer()
+buffer.add_text("Hello")
+buffer.subscribe(lambda text: print(text))
+
+# Tool call buffer
+tool_buffer = ToolCallBuffer()
+tool_buffer.start_tool("tool_1", "Bash")
+tool_buffer.add_partial("tool_1", '{"command": ')
+result = tool_buffer.complete_tool("tool_1")
+```
+
+## Compression
+
+```python
+from cc.core.compression import compress_messages, CompressionStrategy
+
+messages = [{"role": "user", "content": "text"} for _ in range(100)]
+
+compressed = await compress_messages(
+    messages,
+    strategy=CompressionStrategy.SUMMARY,
+    target_tokens=50000,
+)
+```
+
+## Hooks
+
+```python
+from cc.hooks import (
+    use_tool_permission,
+    use_keybindings,
+    KeyMode,
+)
+
+# Permission hook
+allowed = await use_tool_permission("Bash")
+
+# Keybindings hook
+kb = await use_keybindings({
+    "ctrl+p": lambda: print("Previous"),
+    "ctrl+n": lambda: print("Next"),
+})
+kb.set_mode(KeyMode.NORMAL)
+```
+
+## Model Selection
+
+```python
+from cc.utils.model import ModelSelector, AVAILABLE_MODELS
+
+selector = ModelSelector(default_model="claude-sonnet-4-6")
+
+# Select for task
+model = selector.select_for_task("architecture")
+
+# Get model info
+info = AVAILABLE_MODELS["claude-sonnet-4-6"]
+print(f"Price: ${info.input_price}/M input, ${info.output_price}/M output")
+```
+
 ## Core Engine
 
 ### QueryEngine

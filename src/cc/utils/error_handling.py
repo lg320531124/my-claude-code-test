@@ -54,7 +54,7 @@ class ErrorHandler:
     """Unified error handling."""
 
     def __init__(self, log_file: Optional[Path] = None):
-        self.errors: List[ErrorInfo] = []
+        self.errors: List[...] = []
         self._handlers: Dict[ErrorCategory, Callable] = {}
         self._recovery_handlers: Dict[ErrorCategory, Callable] = {}
         self._log_file = log_file
@@ -275,8 +275,8 @@ class RecoveryManager:
     """Manage error recovery strategies."""
 
     def __init__(self):
-        self._strategies: Dict[str, Callable] = {}
-        self._recovery_history: List[dict] = []
+        self._strategies: Dict[str, Callable] = field(default_factory=dict)
+        self._recovery_history: List[...] = field(default_factory=list)
 
     def register_strategy(self, name: str, strategy: Callable) -> None:
         """Register recovery strategy."""

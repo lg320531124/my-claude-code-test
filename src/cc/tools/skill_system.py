@@ -5,9 +5,9 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import ClassVar, Any, Callable, Optional
+from typing import ClassVar, Any, Callable, Optional, List, Dict
 from dataclasses import dataclass, field
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, Field
 
 
 @dataclass
@@ -39,9 +39,9 @@ class SkillValidationError(Exception):
 
 class SkillSchema(BaseModel):
     """Schema for skill validation."""
-    name: str
-    description: str
-    prompt: str
+    name: str = Field(min_length=1)
+    description: str = ""  # Description can be empty
+    prompt: str = Field(min_length=1)
     version: str = "1.0"
     author: str = ""
     tags: List[str] = []
@@ -90,6 +90,9 @@ class SkillLoader:
 
     def _parse_skill_file(self, path: Path, content: str) -> SkillDefinition | None:
         """Parse skill from markdown file."""
+        # Strip leading whitespace
+        content = content.strip()
+
         # Extract frontmatter
         if not content.startswith("---"):
             # No frontmatter - simple prompt file
@@ -100,15 +103,19 @@ class SkillLoader:
             )
 
         # Parse frontmatter
-        parts = content.split("---", 2)
+        parts = content.split("---")
         if len(parts) < 3:
             return None
 
-        frontmatter = parts[1]
-        prompt = parts[2]
+        # parts[0] is empty, parts[1] is frontmatter, parts[2] is prompt (plus any remaining)
+        frontmatter = parts[1].strip()
+        prompt = "---".join(parts[2:]).strip()
 
         # Parse YAML-like frontmatter
         metadata_dict = self._parse_frontmatter(frontmatter)
+
+        # Add prompt to metadata_dict for schema validation
+        metadata_dict["prompt"] = prompt
 
         try:
             # Validate with schema
@@ -125,7 +132,7 @@ class SkillLoader:
 
             return SkillDefinition(
                 metadata=metadata,
-                prompt=prompt.strip(),
+                prompt=schema.prompt.strip(),
                 examples=schema.examples,
                 usage_notes=schema.usage_notes,
             )
@@ -203,6 +210,15 @@ class SkillExecutor:
         """Execute a skill."""
         skill = self.loader.get_skill(skill_name)
 
+        # Record execution attempt (even if skill not found)
+        execution = {
+            "skill": skill_name,
+            "timestamp": time.time(),
+            "args": args,
+            "success": skill is not None,
+        }
+        self._execution_history.append(execution)
+
         if not skill:
             return f"Skill not found: {skill_name}"
 
@@ -213,14 +229,6 @@ class SkillExecutor:
 
         # Add context
         prompt += f"\n\nContext:\n{json.dumps(context, indent=2)}"
-
-        # Record execution
-        execution = {
-            "skill": skill_name,
-            "timestamp": time.time(),
-            "args": args,
-        }
-        self._execution_history.append(execution)
 
         if self._on_execute:
             self._on_execute(skill_name, prompt)
@@ -310,7 +318,9 @@ Provide examples if needed.
 
     async def reload(self) -> None:
         """Reload skills."""
-        self.loader = SkillLoader()
+        # Preserve skill_dirs from previous loader
+        skill_dirs = self.loader.skill_dirs if hasattr(self.loader, 'skill_dirs') else None
+        self.loader = SkillLoader(skill_dirs)
         await self.loader.load_all()
         self.executor = SkillExecutor(self.loader)
 

@@ -1,250 +1,116 @@
-"""Shared tool validation.
-
-Common validation logic for tool inputs.
-"""
+"""Tool Validation - Input validation for tools."""
 
 from __future__ import annotations
 import asyncio
 import re
-from pathlib import Path
-from typing import Dict, Any, Optional
-
-from ..types.tool import ValidationResult
-from ..utils.async_io import exists_async, is_file_async, is_dir_async
+from typing import Any, Dict, Optional, List, Callable
+from dataclasses import dataclass, field
+from enum import Enum
 
 
-def validate_file_path(
-    file_path: str,
-    must_exist: bool = True,
-    must_be_file: bool = True,
-) -> ValidationResult:
-    """Validate file path input."""
-    if not file_path:
-        return ValidationResult(
-            result=False,
-            message="File path is required",
-            error_code=1,
-        )
-
-    # Expand path
-    if file_path.startswith("~"):
-        file_path = str(Path(file_path).expanduser())
-
-    if must_exist:
-        path = Path(file_path)
-        if not path.exists():
-            # Try to find similar file
-            similar = find_similar_file(file_path)
-            msg = f"File does not exist: {file_path}"
-            if similar:
-                msg += f" Did you mean {similar}?"
-            return ValidationResult(
-                result=False,
-                message=msg,
-                error_code=2,
-            )
-
-        if must_be_file and not path.is_file():
-            return ValidationResult(
-                result=False,
-                message=f"Path is not a file: {file_path}",
-                error_code=3,
-            )
-
-    return ValidationResult(result=True)
+class ValidationSeverity(Enum):
+    ERROR = "error"
+    WARNING = "warning"
+    INFO = "info"
 
 
-async def async_validate_file_path(
-    file_path: str,
-    must_exist: bool = True,
-    must_be_file: bool = True,
-) -> ValidationResult:
-    """Async validate file path."""
-    if not file_path:
-        return ValidationResult(
-            result=False,
-            message="File path is required",
-            error_code=1,
-        )
-
-    # Expand path
-    if file_path.startswith("~"):
-        file_path = str(Path(file_path).expanduser())
-
-    if must_exist:
-        exists = await exists_async(file_path)
-        if not exists:
-            similar = await asyncio.get_event_loop().run_in_executor(
-                None, lambda: find_similar_file(file_path)
-            )
-            msg = f"File does not exist: {file_path}"
-            if similar:
-                msg += f" Did you mean {similar}?"
-            return ValidationResult(
-                result=False,
-                message=msg,
-                error_code=2,
-            )
-
-        if must_be_file:
-            is_file = await is_file_async(file_path)
-            if not is_file:
-                return ValidationResult(
-                    result=False,
-                    message=f"Path is not a file: {file_path}",
-                    error_code=3,
-                )
-
-    return ValidationResult(result=True)
+@dataclass
+class ValidationError:
+    field: str
+    message: str
+    severity: ValidationSeverity = ValidationSeverity.ERROR
+    value: Any = None
 
 
-def validate_directory_path(
-    dir_path: str,
-    must_exist: bool = True,
-) -> ValidationResult:
-    """Validate directory path input."""
-    if not dir_path:
-        return ValidationResult(
-            result=False,
-            message="Directory path is required",
-            error_code=1,
-        )
-
-    if dir_path.startswith("~"):
-        dir_path = str(Path(dir_path).expanduser())
-
-    if must_exist:
-        path = Path(dir_path)
-        if not path.exists():
-            return ValidationResult(
-                result=False,
-                message=f"Directory does not exist: {dir_path}",
-                error_code=2,
-            )
-        if not path.is_dir():
-            return ValidationResult(
-                result=False,
-                message=f"Path is not a directory: {dir_path}",
-                error_code=3,
-            )
-
-    return ValidationResult(result=True)
+@dataclass  
+class ValidationResult:
+    valid: bool
+    errors: List[ValidationError] = field(default_factory=list)
+    warnings: List[ValidationError] = field(default_factory=list)
+    sanitized_args: Dict[str, Any] = field(default_factory=dict)
 
 
-async def async_validate_directory_path(
-    dir_path: str,
-    must_exist: bool = True,
-) -> ValidationResult:
-    """Async validate directory path."""
-    if not dir_path:
-        return ValidationResult(
-            result=False,
-            message="Directory path is required",
-            error_code=1,
-        )
+class ToolValidator:
+    def __init__(self):
+        self._validators: Dict[str, Dict[str, Callable]] = {}
+        self._global_validators: List[Callable] = []
 
-    if dir_path.startswith("~"):
-        dir_path = str(Path(dir_path).expanduser())
+    def register_validator(self, tool_name: str, field_name: str, validator: Callable) -> None:
+        if tool_name not in self._validators:
+            self._validators[tool_name] = {}
+        self._validators[tool_name][field_name] = validator
 
-    if must_exist:
-        exists = await exists_async(dir_path)
-        if not exists:
-            return ValidationResult(
-                result=False,
-                message=f"Directory does not exist: {dir_path}",
-                error_code=2,
-            )
+    async def validate(self, tool_name: str, args: Dict[str, Any]) -> ValidationResult:
+        result = ValidationResult(valid=True, sanitized_args=args.copy())
+        
+        field_validators = self._validators.get(tool_name, {})
+        for field_name, validator in field_validators.items():
+            value = args.get(field_name)
+            try:
+                if asyncio.iscoroutinefunction(validator):
+                    valid, error_msg, sanitized = await validator(value)
+                else:
+                    valid, error_msg, sanitized = validator(value)
+                if not valid:
+                    result.errors.append(ValidationError(field=field_name, message=error_msg, value=value))
+                    result.valid = False
+                elif sanitized is not None:
+                    result.sanitized_args[field_name] = sanitized
+            except Exception as e:
+                result.errors.append(ValidationError(field=field_name, message=str(e), value=value))
+                result.valid = False
+        return result
 
-        is_dir = await is_dir_async(dir_path)
-        if not is_dir:
-            return ValidationResult(
-                result=False,
-                message=f"Path is not a directory: {dir_path}",
-                error_code=3,
-            )
+    def validate_path(self, value: Any) -> tuple:
+        if value is None:
+            return False, "Path is required", None
+        if not isinstance(value, str):
+            return False, "Path must be string", None
+        dangerous = [r"\.\./", r"/etc/", r"\.ssh/", r"\.gnupg/"]
+        for pattern in dangerous:
+            if re.search(pattern, value):
+                return False, f"Dangerous pattern: {pattern}", None
+        import os
+        return True, "", os.path.normpath(value)
 
-    return ValidationResult(result=True)
+    def validate_command(self, value: Any) -> tuple:
+        if value is None:
+            return False, "Command required", None
+        if not isinstance(value, str):
+            return False, "Command must be string", None
+        dangerous = ["rm -rf", "dd if=", "mkfs", "format", "> /dev/", "chmod 777"]
+        for cmd in dangerous:
+            if cmd in value:
+                return False, f"Dangerous: {cmd}", None
+        return True, "", value
 
-
-def validate_pattern(pattern: str) -> ValidationResult:
-    """Validate search pattern."""
-    if not pattern:
-        return ValidationResult(
-            result=False,
-            message="Pattern is required",
-            error_code=1,
-        )
-
-    # Check for valid regex (if pattern looks like regex)
-    if any(char in pattern for char in ["(", "[", "*", "+", "?"]):
-        try:
-            re.compile(pattern)
-        except re.error as e:
-            return ValidationResult(
-                result=False,
-                message=f"Invalid regex pattern: {e}",
-                error_code=2,
-            )
-
-    return ValidationResult(result=True)
-
-
-def find_similar_file(file_path: str, cwd: str = "") -> Optional[str]:
-    """Find similar file name (typo correction)."""
-    import os
-    from pathlib import Path
-
-    path = Path(file_path)
-    parent = path.parent
-    name = path.name.lower()
-
-    if not parent.exists():
-        return None
-
-    # List files in parent directory
-    try:
-        files = list(parent.iterdir())
-    except OSError:
-        return None
-
-    # Find similar names
-    for f in files:
-        if f.name.lower() == name:
-            return str(f)
-        # Check for common typos (missing extension, etc.)
-        if f.name.lower().startswith(name[:5]):
-            return str(f)
-
-    return None
+    def validate_url(self, value: Any) -> tuple:
+        if value is None:
+            return False, "URL required", None
+        if not isinstance(value, str):
+            return False, "URL must be string", None
+        if not re.match(r"^https?://[^\s]+$", value):
+            return False, "Invalid URL", None
+        dangerous = ["localhost", "127.0.0.1", "0.0.0.0", "internal"]
+        for domain in dangerous:
+            if domain in value.lower():
+                return False, f"Dangerous domain: {domain}", None
+        return True, "", value
 
 
-def validate_url(url: str) -> ValidationResult:
-    """Validate URL."""
-    if not url:
-        return ValidationResult(
-            result=False,
-            message="URL is required",
-            error_code=1,
-        )
+_validator: Optional[ToolValidator] = None
 
-    # Simple URL validation
-    pattern = r"^https?://[^\s/$.?#].[^\s]*$"
-    if not re.match(pattern, url):
-        return ValidationResult(
-            result=False,
-            message=f"Invalid URL format: {url}",
-            error_code=2,
-        )
+def get_validator() -> ToolValidator:
+    global _validator
+    if _validator is None:
+        _validator = ToolValidator()
+        _validator.register_validator("Read", "file_path", _validator.validate_path)
+        _validator.register_validator("Write", "file_path", _validator.validate_path)
+        _validator.register_validator("Bash", "command", _validator.validate_command)
+        _validator.register_validator("WebFetch", "url", _validator.validate_url)
+    return _validator
 
-    return ValidationResult(result=True)
+async def validate_tool_args(tool_name: str, args: Dict) -> ValidationResult:
+    return await get_validator().validate(tool_name, args)
 
-
-__all__ = [
-    "validate_file_path",
-    "async_validate_file_path",
-    "validate_directory_path",
-    "async_validate_directory_path",
-    "validate_pattern",
-    "validate_url",
-    "find_similar_file",
-]
+__all__ = ["ValidationSeverity", "ValidationError", "ValidationResult", "ToolValidator", "get_validator", "validate_tool_args"]

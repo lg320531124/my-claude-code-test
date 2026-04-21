@@ -3,7 +3,7 @@
 from __future__ import annotations
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 from pydantic import BaseModel
 
@@ -61,11 +61,11 @@ class Config(BaseModel):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(self.model_dump(), indent=2))
 
-    def get_env_overrides(self) -> Dict[str, Any, Optional]:
+    def get_env_overrides(self) -> Dict[str, Any]:
         """Get environment variable overrides."""
         import os
 
-        overrides: Dict[str, Any, Optional] = {}
+        overrides: Dict[str, Any] = {}
 
         # API key
         if "ANTHROPIC_API_KEY" in os.environ:

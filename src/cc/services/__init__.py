@@ -208,6 +208,62 @@ from .rate_limiter.rate_limiter import (
     check_rate,
 )
 
+# MCP (Model Context Protocol)
+from .mcp import (
+    MCPClient,
+    MCPServerConfig,
+    MCPTool,
+    MCPResource,
+    MCPManager,
+    load_mcp_servers,
+)
+
+# LSP (Language Server Protocol)
+from .lsp import (
+    LSPClient,
+    LSPServerConfig,
+    LSPDiagnostic,
+    LSPCompletion,
+    LSPHover,
+    LSPManager,
+)
+
+# Voice (Speech-to-Text / Text-to-Speech)
+from .voice import (
+    VoiceService,
+    VoiceConfig,
+    VoiceStreamProcessor,
+    TranscriptionResult,
+    SpeechConfig,
+)
+
+# Token Estimation
+from .token_estimation import (
+    TokenUsage,
+    TokenBudget,
+    estimate_tokens,
+    estimate_message_tokens,
+    estimate_messages_tokens,
+    TokenCounter,
+    TokenBudgetManager,
+    detect_content_type,
+)
+
+# Settings Sync
+from .settings import (
+    SettingsSnapshot,
+    SyncResult,
+    SettingsSync,
+)
+
+# Team Sync
+from .team import (
+    SyncStatus,
+    TeamMemory,
+    SyncBatch,
+    TeamMemorySync,
+)
+
 __all__ = [
     # API (optional)
     "APIClient",
@@ -346,4 +402,42 @@ __all__ = [
     "RateLimiterService",
     "get_rate_limiter",
     "check_rate",
+    # MCP
+    "MCPClient",
+    "MCPServerConfig",
+    "MCPTool",
+    "MCPResource",
+    "MCPManager",
+    "load_mcp_servers",
+    # LSP
+    "LSPClient",
+    "LSPServerConfig",
+    "LSPDiagnostic",
+    "LSPCompletion",
+    "LSPHover",
+    "LSPManager",
+    # Voice
+    "VoiceService",
+    "VoiceConfig",
+    "VoiceStreamProcessor",
+    "TranscriptionResult",
+    "SpeechConfig",
+    # Token Estimation
+    "TokenUsage",
+    "TokenBudget",
+    "estimate_tokens",
+    "estimate_message_tokens",
+    "estimate_messages_tokens",
+    "TokenCounter",
+    "TokenBudgetManager",
+    "detect_content_type",
+    # Settings Sync
+    "SettingsSnapshot",
+    "SyncResult",
+    "SettingsSync",
+    # Team Sync
+    "SyncStatus",
+    "TeamMemory",
+    "SyncBatch",
+    "TeamMemorySync",
 ]

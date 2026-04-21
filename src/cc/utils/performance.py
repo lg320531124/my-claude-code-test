@@ -7,7 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, TypeVar, Optional
+from typing import Any, Callable, TypeVar, Optional, Dict, List
 import hashlib
 import json
 
@@ -39,11 +39,21 @@ class AsyncCache:
         self.ttl = ttl_seconds
         self.max_bytes = max_bytes
         self._current_bytes = 0
-        self._lock = asyncio.Lock()
+        self._lock: Optional[asyncio.Lock] = None
+
+    def _get_lock(self) -> asyncio.Lock:
+        """Get lock, creating lazily."""
+        if self._lock is None:
+            try:
+                loop = asyncio.get_running_loop()
+                self._lock = asyncio.Lock()
+            except RuntimeError:
+                self._lock = asyncio.Lock()
+        return self._lock
 
     async def get(self, key: str) -> Any | None:
         """Get cached value."""
-        async with self._lock:
+        async with self._get_lock():
             entry = self.cache.get(key)
             if not entry:
                 return None
@@ -58,7 +68,7 @@ class AsyncCache:
 
     async def set(self, key: str, value: Any, ttl: Optional[float] = None) -> None:
         """Set cached value."""
-        async with self._lock:
+        async with self._get_lock():
             # Calculate size
             size = self._estimate_size(value)
 
@@ -88,7 +98,7 @@ class AsyncCache:
 
     async def delete(self, key: str) -> bool:
         """Delete cached value."""
-        async with self._lock:
+        async with self._get_lock():
             if key in self.cache:
                 await self._remove_entry(key)
                 return True
@@ -96,7 +106,7 @@ class AsyncCache:
 
     async def clear(self) -> int:
         """Clear all cache."""
-        async with self._lock:
+        async with self._get_lock():
             count = len(self.cache)
             self.cache.clear()
             self._current_bytes = 0
@@ -202,8 +212,18 @@ class ParallelExecutor:
 
     def __init__(self, max_concurrent: int = 10):
         self.max_concurrent = max_concurrent
-        self._semaphore = asyncio.Semaphore(max_concurrent)
+        self._semaphore: Optional[asyncio.Semaphore] = None
         self._active_tasks: set[asyncio.Task] = set()
+
+    def _get_semaphore(self) -> asyncio.Semaphore:
+        """Get semaphore, creating lazily."""
+        if self._semaphore is None:
+            try:
+                loop = asyncio.get_running_loop()
+                self._semaphore = asyncio.Semaphore(self.max_concurrent)
+            except RuntimeError:
+                self._semaphore = asyncio.Semaphore(self.max_concurrent)
+        return self._semaphore
 
     async def execute(
         self,
@@ -215,7 +235,7 @@ class ParallelExecutor:
         errors = []
 
         async def run_task(task: Callable, idx: int) -> tuple[int, Any, Exception | None]:
-            async with self._semaphore:
+            async with self._get_semaphore():
                 try:
                     result = await task()
                     return (idx, result, None)
@@ -259,7 +279,7 @@ class ParallelExecutor:
         completed = 0
 
         async def run_task(task: Callable, idx: int):
-            async with self._semaphore:
+            async with self._get_semaphore():
                 result = await task()
                 results[idx] = result
                 completed += 1
@@ -283,11 +303,21 @@ class RateLimiter:
         self.burst = burst_size
         self._tokens = burst_size
         self._last_update = time.time()
-        self._lock = asyncio.Lock()
+        self._lock: Optional[asyncio.Lock] = None
+
+    def _get_lock(self) -> asyncio.Lock:
+        """Get lock, creating lazily."""
+        if self._lock is None:
+            try:
+                loop = asyncio.get_running_loop()
+                self._lock = asyncio.Lock()
+            except RuntimeError:
+                self._lock = asyncio.Lock()
+        return self._lock
 
     async def acquire(self) -> None:
         """Acquire rate limit token."""
-        async with self._lock:
+        async with self._get_lock():
             now = time.time()
 
             # Replenish tokens

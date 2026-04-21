@@ -478,6 +478,17 @@ def build_edit_tool() -> EditTool:
     return EditTool()
 
 
+# Add execute method to EditTool
+def _add_execute_method():
+    async def execute(self, input: EditInput, ctx: ToolUseContext) -> ToolResult:
+        """Execute method for simpler interface."""
+        args = input.model_dump() if hasattr(input, 'model_dump') else dict(input)
+        return await self.call(args, ctx, lambda *args: True, None)
+    EditTool.execute = execute
+
+_add_execute_method()
+
+
 __all__ = [
     "EditTool",
     "EditInput",

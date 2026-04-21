@@ -124,7 +124,16 @@ class MCPSubscription:
     def notify(self, content: Any) -> None:
         """Notify subscriber."""
         if self.active and self.callback:
-            asyncio.create_task(self._call_callback(content))
+            try:
+                loop = asyncio.get_running_loop()
+                asyncio.create_task(self._call_callback(content))
+            except RuntimeError:
+                # No running loop, call callback directly if synchronous
+                try:
+                    if not asyncio.iscoroutinefunction(self.callback):
+                        self.callback(self.uri, content)
+                except Exception:
+                    pass
 
     async def _call_callback(self, content: Any) -> None:
         """Call callback."""

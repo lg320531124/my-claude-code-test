@@ -26,21 +26,27 @@ class DiagnosticResult:
     suggestion: Optional[str] = None
 
 
-async def run_command_async(cmd: List[str], timeout: float = 5.0) -> tuple[str, str, int]:
+async def run_command_async(cmd: List[str], timeout: float = 5.0, cwd: Optional[Path] = None) -> tuple[str, str, int]:
     """Run command asynchronously."""
     try:
-        proc = await asyncio.wait_for(
-            asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            ),
-            timeout=timeout,
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(cwd) if cwd else None,
         )
-        stdout, stderr = await proc.communicate()
-        return stdout.decode(), stderr.decode(), proc.returncode
-    except asyncio.TimeoutError:
-        return "", "Timeout", -1
+
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                proc.communicate(),
+                timeout=timeout,
+            )
+            return stdout.decode(), stderr.decode(), proc.returncode or 0
+        except asyncio.TimeoutError:
+            # Kill the process on timeout
+            proc.kill()
+            await proc.wait()
+            return "", "Timeout", -1
     except FileNotFoundError:
         return "", "Not found", -1
     except Exception:
@@ -52,9 +58,9 @@ async def check_python_async() -> DiagnosticResult:
     version = platform.python_version()
     implementation = platform.python_implementation()
 
-    # Check if version is sufficient (3.10+)
+    # Check if version is sufficient (3.9+)
     major, minor = map(int, version.split(".")[:2])
-    ok = major >= 3 and minor >= 10
+    ok = major >= 3 and minor >= 9
 
     return DiagnosticResult(
         name="Python",
@@ -62,7 +68,7 @@ async def check_python_async() -> DiagnosticResult:
         ok=ok,
         status="OK" if ok else "WARNING",
         details=f"{implementation} {version}",
-        suggestion="Python 3.10+ recommended" if not ok else None,
+        suggestion="Python 3.9+ recommended" if not ok else None,
     )
 
 
@@ -363,11 +369,11 @@ async def check_skills_async(cwd: Path) -> DiagnosticResult:
 
 async def check_git_repo_async(cwd: Path) -> DiagnosticResult:
     """Check git repository."""
-    stdout, _, code = await run_command_async(["git", "rev-parse", "--git-dir"], cwd)
+    stdout, _, code = await run_command_async(["git", "rev-parse", "--git-dir"], cwd=cwd)
 
     if code == 0:
         # Get branch
-        stdout2, _, _ = await run_command_async(["git", "branch", "--show-current"], cwd)
+        stdout2, _, _ = await run_command_async(["git", "branch", "--show-current"], cwd=cwd)
         branch = stdout2.strip()
 
         return DiagnosticResult(

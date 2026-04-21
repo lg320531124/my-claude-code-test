@@ -39,7 +39,7 @@ def test_permission_config():
     )
 
     rules = perm.to_rules()
-    assert len(rules) == 3
+    assert len(rules) == 4  # 2 allow + 1 deny + 1 ask
 
     # Deny rules have highest priority
     deny_rules = [r for r in rules if r.decision.value == "deny"]

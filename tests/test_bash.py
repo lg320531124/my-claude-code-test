@@ -8,7 +8,7 @@ def test_bash_tool_schema():
     """Test BashTool has correct schema."""
     tool = BashTool()
     assert tool.name == "Bash"
-    assert "shell" in tool.description.lower()
+    assert "shell" in tool.description_text.lower()
 
 
 def test_bash_input_validation():

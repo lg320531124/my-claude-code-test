@@ -307,6 +307,17 @@ def build_write_tool() -> WriteTool:
     return WriteTool()
 
 
+# Add execute method to WriteTool
+def _add_execute_method():
+    async def execute(self, input: WriteInput, ctx: ToolUseContext) -> ToolResult:
+        """Execute method for simpler interface."""
+        args = input.model_dump() if hasattr(input, 'model_dump') else dict(input)
+        return await self.call(args, ctx, lambda *args: True, None)
+    WriteTool.execute = execute
+
+_add_execute_method()
+
+
 __all__ = [
     "WriteTool",
     "WriteInput",

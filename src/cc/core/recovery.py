@@ -5,7 +5,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, List
 from dataclasses import dataclass, field, asdict
 
 from ..core.session import Session
@@ -52,11 +52,12 @@ class SessionPersistence:
         filename = f"session_{session.session_id}_{timestamp}.json"
         filepath = self.storage_dir / filename
 
-        # Build metadata
+        # Build metadata - convert datetime to timestamp
+        created_at_ts = session.created_at.timestamp() if hasattr(session.created_at, 'timestamp') else session.created_at
         metadata = SessionMetadata(
             session_id=session.session_id,
             cwd=str(session.cwd),
-            created_at=session.created_at,
+            created_at=created_at_ts,
             updated_at=time.time(),
             message_count=len(session.messages),
             token_count=engine_stats.get("total_tokens", 0) if engine_stats else 0,
@@ -237,23 +238,38 @@ class SessionRecovery:
         """Auto-save loop."""
         while True:
             try:
-                await asyncio.sleep(self._auto_save_interval)
-
-                # Save session
+                # Save session immediately on first iteration
                 stats = engine.get_context_summary() if engine else {}
                 config_dict = {
                     "model": config.api.model if config else "",
                 }
 
-                path = self.persistence.save(session, stats, config_dict)
+                # Run save in executor to avoid blocking
+                loop = asyncio.get_running_loop()
+                path = await loop.run_in_executor(
+                    None,
+                    self.persistence.save,
+                    session,
+                    stats,
+                    config_dict,
+                )
                 self._current_session_path = path
 
                 # Write recovery file
-                self._write_recovery_file(path)
+                await loop.run_in_executor(
+                    None,
+                    self._write_recovery_file,
+                    path,
+                )
+
+                # Then wait for next interval
+                await asyncio.sleep(self._auto_save_interval)
 
             except asyncio.CancelledError:
                 break
             except Exception:
+                await asyncio.sleep(self._auto_save_interval)
+                continue
                 continue
 
     def _write_recovery_file(self, session_path: Path) -> None:
@@ -294,8 +310,9 @@ class SessionRecovery:
             session_id=session_data.metadata.session_id,
         )
 
-        # Restore created_at
-        session.created_at = session_data.metadata.created_at
+        # Restore created_at - convert timestamp back to datetime
+        from datetime import datetime
+        session.created_at = datetime.fromtimestamp(session_data.metadata.created_at)
 
         # Messages are restored via engine history
         return session

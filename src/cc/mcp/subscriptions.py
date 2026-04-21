@@ -5,7 +5,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
+from typing import Any, Callable, ClassVar, Optional, Dict, List
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict
@@ -50,9 +50,20 @@ class SubscriptionManager:
         self._uri_to_subs: Dict[str, List[str]] = defaultdict(list)
         self._listener_task: asyncio.Task | None = None
         self._running = False
-        self._update_queue: asyncio.Queue = asyncio.Queue()
+        self._update_queue: asyncio.Queue | None = None  # Created on demand
         self._on_update: Optional[Callable] = None
         self._sub_counter: int = 0
+
+    def _get_queue(self) -> asyncio.Queue:
+        """Get or create update queue."""
+        if self._update_queue is None:
+            try:
+                loop = asyncio.get_running_loop()
+                self._update_queue = asyncio.Queue()
+            except RuntimeError:
+                # No running loop - will be initialized when async context is available
+                pass
+        return self._update_queue
 
     async def start(self) -> None:
         """Start subscription listener."""
@@ -80,11 +91,12 @@ class SubscriptionManager:
 
     async def _listen_loop(self) -> None:
         """Main listener loop."""
+        queue = self._get_queue()
         while self._running:
             try:
                 # Wait for updates
                 update = await asyncio.wait_for(
-                    self._update_queue.get(),
+                    queue.get(),
                     timeout=30.0,
                 )
                 await self._process_update(update)
@@ -205,7 +217,9 @@ class SubscriptionManager:
 
     def push_update(self, update: ResourceUpdate) -> None:
         """Push a resource update."""
-        self._update_queue.put_nowait(update)
+        queue = self._get_queue()
+        if queue is not None:
+            queue.put_nowait(update)
 
     async def wait_for_update(
         self,

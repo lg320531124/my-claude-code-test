@@ -72,8 +72,8 @@ def ring_bell():
 
 
 @terminal_group.command("env")
-@click.argument("name", default=None)
-def show_env(name: Optional[str]):
+@click.argument("name", default=None, required=False)
+def show_env(name: Optional[str] = None):
     """Show environment variables."""
     import os
 

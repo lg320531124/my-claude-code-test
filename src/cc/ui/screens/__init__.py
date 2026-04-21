@@ -1,91 +1,68 @@
-"""Screens package - Multiple screens for different functionality."""
+"""UI Screens - Terminal screen components."""
 
 from __future__ import annotations
-from textual.binding import Binding
-from textual.screen import Screen
-from textual.containers import Container, Vertical, Horizontal, VerticalScroll
-from textual.widgets import Header, Footer, Static, Button, Label
 
-from .screens import (
-    HelpScreen,
-    SessionsScreen,
-    SessionLoadRequest,
-    PluginsScreen,
-    HooksScreen,
+# Try to import textual-dependent screens
+try:
+    from .onboarding import OnboardingScreen, OnboardingStep
+    from .mcp import MCPScreen, MCPServerInfo
+    from .search import SearchScreen, SearchConfig
+    _TEXTUAL_AVAILABLE = True
+except ImportError:
+    _TEXTUAL_AVAILABLE = False
+    OnboardingScreen = None
+    OnboardingStep = None
+    MCPScreen = None
+    MCPServerInfo = None
+    SearchScreen = None
+    SearchConfig = None
+
+# Basic screens (no textual dependency)
+from .settings import (
+    SettingCategory,
+    SettingItem,
     SettingsScreen,
+)
+from .history import (
+    HistoryFilter,
+    HistoryEntry,
+    HistoryScreen,
+)
+from .stats import (
+    StatsCategory,
+    StatsItem,
+    StatsSection,
     StatsScreen,
-    MessageHistoryScreen,
+)
+from .tasks import (
+    TaskStatus,
+    TaskPriority,
+    TaskItem,
+    TasksScreen,
 )
 
-
-class DoctorScreen(Screen):
-    """Diagnostic screen."""
-
-    CSS = """
-    DoctorScreen {
-        layout: vertical;
-    }
-
-    #diagnostic-output {
-        height: 1fr;
-        overflow-y: auto;
-        padding: 1;
-    }
-    """
-
-    BINDINGS = [
-        Binding("escape", "back", "Back"),
-    ]
-
-    def compose(self):
-        yield Header()
-        yield Container(
-            VerticalScroll(
-                Static("Running diagnostics...", id="diagnostic-output"),
-            ),
-            id="doctor-content",
-        )
-        yield Footer()
-
-    def action_back(self) -> None:
-        self.app.pop_screen()
-
-
-class ConfigScreen(Screen):
-    """Configuration screen."""
-
-    CSS = """
-    ConfigScreen {
-        layout: vertical;
-    }
-    """
-
-    BINDINGS = [
-        Binding("escape", "back", "Back"),
-    ]
-
-    def compose(self):
-        yield Header()
-        yield Container(
-            Label("Configuration"),
-            Static("Edit configuration here"),
-            id="config-content",
-        )
-        yield Footer()
-
-    def action_back(self) -> None:
-        self.app.pop_screen()
-
-
 __all__ = [
-    "HelpScreen",
-    "SessionsScreen",
-    "SessionLoadRequest",
-    "PluginsScreen",
-    "HooksScreen",
+    # Textual screens (optional)
+    "OnboardingScreen",
+    "OnboardingStep",
+    "MCPScreen",
+    "MCPServerInfo",
+    "SearchScreen",
+    "SearchConfig",
+    "_TEXTUAL_AVAILABLE",
+    # Basic screens
+    "SettingCategory",
+    "SettingItem",
     "SettingsScreen",
+    "HistoryFilter",
+    "HistoryEntry",
+    "HistoryScreen",
+    "StatsCategory",
+    "StatsItem",
+    "StatsSection",
     "StatsScreen",
-    "MessageHistoryScreen",
-    "DoctorScreen",
-    "ConfigScreen",
+    "TaskStatus",
+    "TaskPriority",
+    "TaskItem",
+    "TasksScreen",
 ]

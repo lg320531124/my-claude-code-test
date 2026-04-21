@@ -49,6 +49,11 @@ class PermissionResult:
     reason: Optional[str] = None
     rule: Optional[str] = None  # Which rule triggered this decision
 
+    def __post_init__(self):
+        # Allow string decision to be converted to PermissionDecision
+        if isinstance(self.decision, str):
+            self.decision = PermissionDecision(self.decision)
+
     @property
     def behavior(self) -> str:
         """Alias for decision (matching TypeScript behavior)."""

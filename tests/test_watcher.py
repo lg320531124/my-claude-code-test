@@ -105,20 +105,20 @@ async def test_file_watcher_detect_new_file(temp_dir):
     results = []
     watcher.add_callback(lambda e: results.append(e))
 
+    # Start watcher - this takes initial snapshot
     await watcher.start()
-    await watcher._snapshot_state()
 
     # Create new file
     new_file = temp_dir / "new.txt"
     new_file.write_text("content")
 
-    await asyncio.sleep(0.3)
-    events = await watcher._check_changes()
+    # Wait for watch loop to detect
+    await asyncio.sleep(0.5)
 
     await watcher.stop()
 
-    assert len(events) > 0
-    assert events[0].type == FileEventType.CREATED
+    assert len(results) > 0
+    assert results[0].type == FileEventType.CREATED
 
 
 @pytest.mark.asyncio
@@ -129,19 +129,22 @@ async def test_file_watcher_detect_modification(temp_dir):
     test_file.write_text("original")
 
     watcher = FileWatcher([temp_dir], poll_interval=0.1)
+
+    results = []
+    watcher.add_callback(lambda e: results.append(e))
+
     await watcher.start()
-    await watcher._snapshot_state()
 
     # Modify file
     test_file.write_text("modified")
 
-    await asyncio.sleep(0.3)
-    events = await watcher._check_changes()
+    # Wait for watch loop to detect
+    await asyncio.sleep(0.5)
 
     await watcher.stop()
 
-    assert len(events) > 0
-    assert events[0].type == FileEventType.MODIFIED
+    assert len(results) > 0
+    assert results[0].type == FileEventType.MODIFIED
 
 
 def test_context_updater():
@@ -187,7 +190,7 @@ async def test_project_structure_detect_type(temp_dir):
     (temp_dir / "pyproject.toml").write_text("""
 [project]
 name = "test"
-"")
+""")
 
     structure = ProjectStructure(temp_dir)
     type = await structure._detect_project_type()
@@ -227,7 +230,7 @@ async def test_project_structure_dependencies(temp_dir):
     (temp_dir / "pyproject.toml").write_text("""
 [project]
 dependencies = ["requests", "click"]
-"")
+""")
 
     structure = ProjectStructure(temp_dir)
     deps = await structure._get_dependencies()

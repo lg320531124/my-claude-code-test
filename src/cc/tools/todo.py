@@ -1,7 +1,7 @@
 """TodoWriteTool - Todo list management."""
 
 from __future__ import annotations
-from typing import Optional, ClassVar
+from typing import Optional, ClassVar, List
 from datetime import datetime
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext

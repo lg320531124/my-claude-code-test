@@ -129,12 +129,15 @@ def hash_input(tool_name: str, tool_input: dict) -> str:
     # Normalize input
     if tool_name == "Bash":
         # Hash command only
-        key = tool_input.get("command", "")
+        content = tool_input.get("command", "")
     elif tool_name in ("Read", "Write", "Edit"):
         # Hash file path
-        key = tool_input.get("file_path", "")
+        content = tool_input.get("file_path", "")
     else:
         # Hash full input
-        key = json.dumps(tool_input, sort_keys=True)
+        content = json.dumps(tool_input, sort_keys=True)
+
+    # Include tool_name in hash to differentiate between tools
+    key = f"{tool_name}:{content}"
 
     return hashlib.md5(key.encode()).hexdigest()[:16]

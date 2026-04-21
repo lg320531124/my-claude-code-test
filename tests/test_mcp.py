@@ -11,6 +11,13 @@ from cc.mcp.server import MCPToolRegistry, MCPServerProcess
 from cc.mcp.resources import MCPResourceCache, MCPSubscription, ResourceRegistry
 
 
+@pytest.fixture
+def temp_dir():
+    """Create temporary directory."""
+    with tempfile.TemporaryDirectory() as d:
+        yield Path(d)
+
+
 def test_mcp_connection_init():
     """Test MCP connection initialization."""
     conn = MCPConnection(

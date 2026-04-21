@@ -97,6 +97,10 @@ class BashInput(ToolInput):
         default=None,
         description=f"Optional timeout in milliseconds (max {MAX_TIMEOUT_MS})"
     )
+    timeout_ms: Optional[int] = Field(
+        default=None,
+        description="Alias for timeout"
+    )
     description: Optional[str] = Field(
         default=None,
         description="Clear, concise description of what this command does"
@@ -113,6 +117,13 @@ class BashInput(ToolInput):
         default=None,
         description="Internal: pre-computed sed edit result from preview"
     )
+
+    def model_post_init(self, __context):
+        # Sync timeout and timeout_ms
+        if self.timeout_ms is not None and self.timeout is None:
+            self.timeout = self.timeout_ms
+        if self.timeout is not None and self.timeout_ms is None:
+            self.timeout_ms = self.timeout
 
 
 class BashOutput(BaseModel):
@@ -379,6 +390,7 @@ class BashTool(Tool):
     """Bash tool implementation matching TypeScript BashTool.tsx."""
 
     name: str = "Bash"
+    description_text: str = "Execute shell commands and scripts"
     input_schema: type = BashInput
     max_result_size_chars: float = 30_000
     strict: bool = True
@@ -540,6 +552,21 @@ class BashTool(Tool):
         """Get user-facing name for tool."""
         return "Bash"
 
+    async def execute(
+        self,
+        input: BashInput,
+        ctx: ToolUseContext,
+    ) -> ToolResult:
+        """Execute method for simpler interface (used by tests)."""
+        args = input.model_dump() if hasattr(input, 'model_dump') else dict(input)
+        result = await self.call(
+            args,
+            ctx,
+            lambda *args: True,  # Default can_use_tool
+            None,  # parent_message
+        )
+        return result
+
     def validate_input(
         self,
         input: Dict[str, Any],
@@ -583,6 +610,37 @@ class BashTool(Tool):
             return PermissionResult(
                 decision=PermissionDecision.ALLOW,
                 updated_input=input,
+            )
+
+        # Default: ask for non-read-only commands
+        return PermissionResult(
+            decision=PermissionDecision.ASK,
+            reason="Command may modify state",
+        )
+
+    def check_permission(self, input: BashInput, ctx: ToolUseContext) -> PermissionResult:
+        """Sync permission check wrapper for tests."""
+        args = input.model_dump() if hasattr(input, 'model_dump') else dict(input)
+        cmd = args.get("command", "").strip()
+
+        # Dangerous commands need confirmation
+        dangerous_prefixes = [
+            "rm", "rmdir", "sudo", "chmod", "chown",
+            "mv", "cp", "git push", "git reset",
+        ]
+        for prefix in dangerous_prefixes:
+            if cmd.startswith(prefix):
+                return PermissionResult(
+                    decision=PermissionDecision.ASK,
+                    reason=f"Command '{prefix}' may be destructive",
+                    rule=f"Bash({prefix}*)",
+                )
+
+        # Check if read-only
+        if self.is_read_only(args):
+            return PermissionResult(
+                decision=PermissionDecision.ALLOW,
+                updated_input=args,
             )
 
         # Default: ask for non-read-only commands

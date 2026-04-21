@@ -98,8 +98,8 @@ class PromptService:
             ),
             PromptTemplate(
                 name="explain",
-                content="Explain the following code or concept in clear, simple terms.\n\n"
-                "Target audience: developers with intermediate experience.\n\n"
+                content="Explain the following {{topic}} in clear, simple terms.\n\n"
+                "Target audience: developers with {{level}} experience.\n\n"
                 "Include:\n"
                 "- High-level overview\n"
                 "- Key components and their roles\n"

@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import time
 from pathlib import Path
-from typing import Callable, Any, ClassVar, Optional
+from typing import Callable, Any, ClassVar, Optional, Dict, List
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -314,14 +314,24 @@ class ProjectStructure:
         """Get project dependencies."""
         deps = []
 
-        # Python
+        # Python - try tomllib (3.11+) or tomli
         pyproject = self.cwd / "pyproject.toml"
         if pyproject.exists():
             try:
+                # Python 3.11+
                 import tomllib
                 with open(pyproject, "rb") as f:
                     data = tomllib.load(f)
                     deps.extend(data.get("project", {}).get("dependencies", []))
+            except ImportError:
+                # Python 3.9/3.10 - try tomli
+                try:
+                    import tomli
+                    with open(pyproject, "rb") as f:
+                        data = tomli.load(f)
+                        deps.extend(data.get("project", {}).get("dependencies", []))
+                except ImportError:
+                    pass
             except Exception:
                 pass
 

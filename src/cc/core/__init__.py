@@ -51,6 +51,69 @@ except ImportError:
     list_saved_sessions = None
     load_session = None
 
+# Streaming
+from .streaming import (
+    SSEEventType,
+    SSEEvent,
+    StreamState,
+    SSEParser,
+    stream_api_response,
+    collect_stream_text,
+    collect_stream_tool_calls,
+    StreamBuffer,
+    ToolCallBuffer,
+)
+
+# Compression
+from .compression import (
+    CompressionStrategy,
+    CompressionConfig,
+    CompressionResult,
+    MessageCompressor,
+    compress_messages,
+    should_compress,
+    estimate_compression_savings,
+)
+
+# Executor
+from .executor import (
+    ExecutorMode,
+    ExecutionPlan,
+    PlanResult,
+    CoreExecutor,
+    get_core_executor,
+    execute_tools,
+)
+
+# Rate Limiter
+from .rate_limiter import (
+    LimitType,
+    RateLimit,
+    LimitState,
+    RateLimitConfig,
+    RateLimiter,
+)
+
+# Error Recovery
+from .error_recovery import (
+    ErrorType,
+    RecoveryStrategy,
+    ErrorInfo,
+    RecoveryConfig,
+    RecoveryState,
+    ErrorRecovery,
+)
+
+# Request Queue
+from .request_queue import (
+    QueuePriority,
+    QueueStatus,
+    QueuedRequest,
+    QueueConfig,
+    QueueStats,
+    RequestQueue,
+)
+
 __all__ = [
     # Engine (optional)
     "QueryEngine",
@@ -74,4 +137,49 @@ __all__ = [
     "save_current_session",
     "list_saved_sessions",
     "load_session",
+    # Streaming
+    "SSEEventType",
+    "SSEEvent",
+    "StreamState",
+    "SSEParser",
+    "stream_api_response",
+    "collect_stream_text",
+    "collect_stream_tool_calls",
+    "StreamBuffer",
+    "ToolCallBuffer",
+    # Compression
+    "CompressionStrategy",
+    "CompressionConfig",
+    "CompressionResult",
+    "MessageCompressor",
+    "compress_messages",
+    "should_compress",
+    "estimate_compression_savings",
+    # Executor
+    "ExecutorMode",
+    "ExecutionPlan",
+    "PlanResult",
+    "CoreExecutor",
+    "get_core_executor",
+    "execute_tools",
+    # Rate Limiter
+    "LimitType",
+    "RateLimit",
+    "LimitState",
+    "RateLimitConfig",
+    "RateLimiter",
+    # Error Recovery
+    "ErrorType",
+    "RecoveryStrategy",
+    "ErrorInfo",
+    "RecoveryConfig",
+    "RecoveryState",
+    "ErrorRecovery",
+    # Request Queue
+    "QueuePriority",
+    "QueueStatus",
+    "QueuedRequest",
+    "QueueConfig",
+    "QueueStats",
+    "RequestQueue",
 ]

@@ -30,20 +30,51 @@ class ToolInput(BaseModel):
 
 @dataclass
 class ToolResult:
-    """Tool execution result (matching TypeScript ToolResult)."""
+    """Tool execution result (matching TypeScript ToolResult).
 
-    data: Any
+    Supports both old and new interface:
+    - New: ToolResult(content="...", is_error=False, metadata={})
+    - Old: ToolResult(data="...") or ToolResult(error=True, error_message="...")
+    """
+
+    content: Any = None  # Main output content
+    is_error: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    # Legacy aliases (accepted for backward compatibility)
+    data: Optional[Any] = None
+    error: Optional[bool] = None  # Legacy alias for is_error
+    error_message: Optional[str] = None  # Legacy alias for content when error
     new_messages: Optional[List[Any]] = None
     context_modifier: Optional[Callable] = None
     mcp_meta: Optional[Dict[str, Any]] = None  # MCP metadata
 
+    def __post_init__(self):
+        # Handle legacy data parameter
+        if self.data is not None and self.content is None:
+            self.content = self.data
+
+        # Handle legacy error/error_message parameters
+        if self.error is True:
+            self.is_error = True
+        if self.error_message is not None and self.content is None:
+            self.content = self.error_message
+
+        # Ensure content is set
+        if self.content is None:
+            self.content = ""
+
+        # Sync data back to content if content was set but data wasn't
+        if self.data is None:
+            self.data = self.content
+
     def to_block(self, tool_use_id: str) -> ToolResultBlock:
         """Convert to ToolResultBlock for API."""
-        content = self.data if isinstance(self.data, str) else str(self.data)
+        content_str = self.content if isinstance(self.content, str) else str(self.content)
         return ToolResultBlock(
             tool_use_id=tool_use_id,
-            content=content,
-            is_error=False,
+            content=content_str,
+            is_error=self.is_error,
         )
 
 
@@ -111,6 +142,8 @@ class ToolUseContext:
 
     # Permissions
     permission_mode: str = "default"
+    user_type: str = "external"  # User type for permission checks
+    sandbox_enabled: bool = False  # Sandbox mode
 
     # Session
     cwd: str = ""
@@ -437,6 +470,11 @@ TOOL_DEFAULTS = {
     "user_facing_name": lambda input=None: "",
 }
 
+# Async defaults for methods that should be async
+ASYNC_DEFAULTS = {
+    "check_permissions": lambda input=None, ctx=None: PermissionResult(decision=PermissionDecision.ALLOW, updated_input=input),
+}
+
 
 class ToolDef:
     """Tool definition for building tools with defaults.
@@ -466,12 +504,19 @@ class ToolDef:
             self.is_read_only = TOOL_DEFAULTS["is_read_only"]
         if not hasattr(self, 'is_destructive'):
             self.is_destructive = TOOL_DEFAULTS["is_destructive"]
-        if not hasattr(self, 'check_permissions'):
-            self.check_permissions = TOOL_DEFAULTS["check_permissions"]
         if not hasattr(self, 'to_auto_classifier_input'):
             self.to_auto_classifier_input = TOOL_DEFAULTS["to_auto_classifier_input"]
         if not hasattr(self, 'user_facing_name'):
             self.user_facing_name = lambda input=None: self.name
+
+    async def check_permissions(
+        self,
+        input: Dict[str, Any],
+        context: ToolUseContext,
+    ) -> PermissionResult:
+        """Check tool permissions."""
+        # Default: allow all
+        return PermissionResult(decision=PermissionDecision.ALLOW, updated_input=input)
 
     async def call(
         self,
@@ -491,6 +536,32 @@ class ToolDef:
     ) -> str:
         """Generate description."""
         return getattr(self, 'description_text', self.name)
+
+    def get_api_schema(self) -> Dict[str, Any]:
+        """Generate Anthropic API-compatible tool schema."""
+        if hasattr(self.input_schema, 'model_json_schema'):
+            schema = self.input_schema.model_json_schema()
+        else:
+            schema = getattr(self, 'input_json_schema', {"type": "object", "properties": {}})
+
+        return {
+            "name": self.name,
+            "description": getattr(self, 'description_text', self.name),
+            "input_schema": schema,
+        }
+
+    async def validate_input(
+        self,
+        input: Dict[str, Any],
+        context: ToolUseContext,
+    ) -> ValidationResult:
+        """Validate tool input."""
+        try:
+            if hasattr(self.input_schema, 'model_validate'):
+                self.input_schema.model_validate(input)
+            return ValidationResult(result=True)
+        except Exception as e:
+            return ValidationResult(result=False, message=str(e))
 
 
 def build_tool(defn: ToolDef) -> Tool:
@@ -531,8 +602,8 @@ def build_tool(defn: ToolDef) -> Tool:
         def is_destructive(self, input):
             return self._defn.is_destructive(input)
 
-        def check_permissions(self, input, context):
-            return self._defn.check_permissions(input, context)
+        async def check_permissions(self, input, context):
+            return await self._defn.check_permissions(input, context)
 
         def to_auto_classifier_input(self, input):
             return self._defn.to_auto_classifier_input(input)
@@ -544,13 +615,14 @@ def build_tool(defn: ToolDef) -> Tool:
 
 
 def tool_matches_name(tool: Union[Tool, Dict], name: str) -> bool:
-    """Check if tool name matches (supports aliases)."""
+    """Check if tool name matches (supports aliases and case-insensitive)."""
     tool_name = tool.name if hasattr(tool, 'name') else tool.get('name', '')
     aliases = tool.aliases if hasattr(tool, 'aliases') else tool.get('aliases', [])
 
-    if tool_name == name:
+    # Case-insensitive match
+    if tool_name.lower() == name.lower():
         return True
-    if aliases and name in aliases:
+    if aliases and name.lower() in [a.lower() for a in aliases]:
         return True
     return False
 

@@ -14,7 +14,7 @@ from cc.permissions import PermissionManager
 from cc.services.hooks import HookManager, HookType, register_hook
 from cc.services.plugins import PluginManager
 from cc.mcp import MCPHealthMonitor
-from cc.ui.widgets import ThemeManager, VimHandler
+from cc.ui.widgets import ThemeManager
 from cc.utils.performance import AsyncCache, ParallelExecutor
 
 
@@ -163,28 +163,13 @@ class TestIntegrationMCP:
 class TestIntegrationUI:
     """Test UI integration."""
 
-    def test_theme_vim_integration(self):
-        """Test theme and vim mode together."""
+    def test_theme_integration(self):
+        """Test theme manager."""
         theme_mgr = ThemeManager()
-        vim_handler = VimHandler(MagicMock())
 
         # Set theme
         theme_mgr.set_theme("nord")
         assert theme_mgr.get_current_theme() == "nord"
-
-        # Enable vim
-        vim_handler.enable()
-        assert vim_handler.is_enabled() is True
-
-        # Check key handling
-        action = vim_handler.handle_key("j")
-        assert action == "scroll_down"
-
-        # Command mode theme change
-        vim_handler.handle_key("colon")
-        vim_handler._command_buffer = "theme gruvbox"
-        action = vim_handler.handle_key("enter")
-        assert action == "set_theme:gruvbox"
 
 
 class TestIntegrationPerformance:

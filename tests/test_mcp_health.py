@@ -284,7 +284,8 @@ class TestMCPServerRegistry:
 
     def test_init(self):
         """Test registry initialization."""
-        registry = MCPServerRegistry()
+        # Use a non-existent path to get clean state
+        registry = MCPServerRegistry(Path("/nonexistent/path/mcp.json"))
         assert registry.server_configs == {}
 
     def test_with_config_file(self):
@@ -312,7 +313,7 @@ class TestMCPServerRegistry:
 
     def test_list_servers(self):
         """Test listing servers."""
-        registry = MCPServerRegistry()
+        registry = MCPServerRegistry(Path("/nonexistent/path/mcp.json"))
         registry.server_configs["s1"] = {}
         registry.server_configs["s2"] = {}
 

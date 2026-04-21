@@ -3,34 +3,37 @@
 import pytest
 from pathlib import Path
 import tempfile
+import asyncio
 
-from cc.commands.doctor import check_python, check_git, check_ripgrep
-from cc.commands.commit import get_git_info
-from cc.commands.compact import estimate_context_usage
+from cc.commands.doctor import check_python_async, check_git_async, check_ripgrep_async
 
 
-def test_check_python():
+@pytest.mark.asyncio
+async def test_check_python():
     """Test Python check."""
-    result = check_python()
-    assert result["ok"]
-    assert "Python" in result["name"]
+    result = await check_python_async()
+    assert result.ok
+    assert "Python" in result.name
 
 
-def test_check_git():
+@pytest.mark.asyncio
+async def test_check_git():
     """Test git check."""
-    result = check_git()
-    # Git might or might not be installed
-    assert result["name"] == "Git"
+    result = await check_git_async()
+    assert result.name == "Git"
 
 
-def test_check_ripgrep():
+@pytest.mark.asyncio
+async def test_check_ripgrep():
     """Test ripgrep check."""
-    result = check_ripgrep()
-    assert result["name"] == "Ripgrep"
+    result = await check_ripgrep_async()
+    assert result.name == "Ripgrep"
 
 
-def test_estimate_context_usage():
+@pytest.mark.asyncio
+async def test_estimate_context_usage():
     """Test context estimation."""
+    from cc.commands.compact import estimate_context_usage
     from cc.types.message import UserMessage, TextBlock
 
     messages = [
@@ -43,7 +46,8 @@ def test_estimate_context_usage():
     assert usage["estimated_tokens"] > 0
 
 
-def test_compact_messages():
+@pytest.mark.asyncio
+async def test_compact_messages():
     """Test message compacting."""
     from cc.commands.compact import run_compact
     from cc.core.session import Session

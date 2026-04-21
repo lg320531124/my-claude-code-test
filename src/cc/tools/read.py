@@ -185,11 +185,11 @@ class ReadInput(ToolInput):
 
     file_path: str = Field(description="The absolute path to the file to read")
     offset: Optional[int] = Field(
-        default=None,
+        default=0,
         description="The line number to start reading from"
     )
     limit: Optional[int] = Field(
-        default=None,
+        default=2000,
         description="The number of lines to read"
     )
     pages: Optional[str] = Field(
@@ -887,3 +887,14 @@ __all__ = [
     "DEFAULT_MAX_SIZE_BYTES",
     "PDF_MAX_PAGES_PER_READ",
 ]
+
+
+# Add execute method to ReadTool
+def _add_execute_method():
+    async def execute(self, input: ReadInput, ctx: ToolUseContext) -> ToolResult:
+        """Execute method for simpler interface."""
+        args = input.model_dump() if hasattr(input, 'model_dump') else dict(input)
+        return await self.call(args, ctx, lambda *args: True, None)
+    ReadTool.execute = execute
+
+_add_execute_method()

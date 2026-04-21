@@ -4,11 +4,12 @@ import pytest
 import asyncio
 from pathlib import Path
 import tempfile
+from typing import Dict, Any, Callable, Optional
 
 from cc.core.engine import QueryEngine, MessageHistory, ToolExecutor, QueryStats
 from cc.types.message import create_user_message, UserMessage, AssistantMessage, TextBlock
 from cc.types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
-from cc.types.permission import PermissionDecision
+from cc.types.permission import PermissionDecision, PermissionResult
 
 
 class MockTool(ToolDef):
@@ -22,12 +23,22 @@ class MockTool(ToolDef):
 
     input_schema = MockInput
 
-    async def execute(self, input: MockInput, ctx: ToolUseContext) -> ToolResult:
-        return ToolResult(content=f"Mock result: {input.value}")
+    async def call(
+        self,
+        args: Dict[str, Any],
+        context: ToolUseContext,
+        can_use_tool: Callable,
+        parent_message: Any,
+        on_progress: Optional[Callable] = None,
+    ) -> ToolResult:
+        return ToolResult(content=f"Mock result: {args.get('value', 'test')}")
 
-    def check_permission(self, input: MockInput, ctx: ToolUseContext) -> PermissionResult:
-        from cc.types.permission import PermissionResult, PermissionDecision
-        return PermissionResult(decision=PermissionDecision.ALLOW.value)
+    async def check_permissions(
+        self,
+        input: Dict[str, Any],
+        context: ToolUseContext,
+    ) -> PermissionResult:
+        return PermissionResult(decision=PermissionDecision.ALLOW, updated_input=input)
 
 
 def test_message_history_add():
@@ -221,20 +232,25 @@ def test_message_history_clear():
 
 def test_query_engine_init():
     """Test QueryEngine initialization."""
-    engine = QueryEngine(
-        model="claude-sonnet-4-6",
-        tools=[],
-        max_tokens=4096,
-    )
+    from cc.core.engine import QueryEngineConfig
 
-    assert engine.model == "claude-sonnet-4-6"
-    assert engine.max_tokens == 4096
-    assert engine.max_turns == 20
+    config = QueryEngineConfig(
+        cwd="/tmp",
+        tools=[],
+        user_specified_model="claude-sonnet-4-6",
+    )
+    engine = QueryEngine(config)
+
+    assert engine.config.user_specified_model == "claude-sonnet-4-6"
+    assert engine.config.max_turns == 20
 
 
 def test_query_engine_callbacks():
     """Test setting callbacks."""
-    engine = QueryEngine()
+    from cc.core.engine import QueryEngineConfig
+
+    config = QueryEngineConfig(cwd="/tmp", tools=[])
+    engine = QueryEngine(config)
 
     def on_text(text): pass
     def on_tool_start(name): pass
@@ -252,7 +268,10 @@ def test_query_engine_callbacks():
 
 def test_query_engine_context_summary():
     """Test context summary."""
-    engine = QueryEngine()
+    from cc.core.engine import QueryEngineConfig
+
+    config = QueryEngineConfig(cwd="/tmp", tools=[])
+    engine = QueryEngine(config)
 
     summary = engine.get_context_summary()
     assert "history" in summary

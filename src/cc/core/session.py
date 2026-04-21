@@ -4,9 +4,9 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, ClassVar
+from typing import Optional, ClassVar, List, Dict, Any
 
-from ..types.message import Message
+from ..types.message import Message, UserMessage, TextBlock
 from ..types.tool import ToolUseContext
 
 
@@ -22,6 +22,9 @@ class Session:
         self.session_id = session_id or str(uuid.uuid4())
         self.messages: List[Message] = []
         self.started_at = datetime.now()
+        self.created_at = datetime.now()  # Alias for started_at
+        self.metadata: Dict[str, Any] = {}
+        self.git_branch: Optional[str] = None
 
     def get_context(self) -> ToolUseContext:
         """Get tool execution context."""
@@ -58,6 +61,48 @@ class Session:
         self.cwd = Path(data["cwd"])
         self.messages = [Message.model_validate(m) for m in data["messages"]]
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize session to dict."""
+        messages_data = []
+        for m in self.messages:
+            content_list = []
+            content = m.content if isinstance(m.content, list) else [m.content]
+            for c in content:
+                if hasattr(c, 'text'):
+                    content_list.append({"type": "text", "text": c.text})
+                else:
+                    content_list.append({"type": "text", "text": str(c)})
+            messages_data.append({"role": m.role, "content": content_list})
+
+        return {
+            "session_id": self.session_id,
+            "cwd": str(self.cwd),
+            "started_at": self.started_at.isoformat(),
+            "messages": messages_data,
+            "metadata": self.metadata,
+            "git_branch": self.git_branch,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Session:
+        """Deserialize session from dict."""
+        session = cls(
+            cwd=Path(data.get("cwd", "/tmp")),
+            session_id=data.get("session_id"),
+        )
+        session.metadata = data.get("metadata", {})
+        session.git_branch = data.get("git_branch")
+
+        # Parse messages
+        for msg_data in data.get("messages", []):
+            if msg_data.get("role") == "user":
+                content = msg_data.get("content", [])
+                text_parts = [c.get("text", "") for c in content if c.get("type") == "text"]
+                if text_parts:
+                    session.messages.append(UserMessage(content=[TextBlock(text=" ".join(text_parts))]))
+
+        return session
+
 
 class SessionManager:
     """Manages multiple sessions and session history."""
@@ -68,13 +113,24 @@ class SessionManager:
         self.sessions_dir = sessions_dir or self.SESSIONS_DIR
         self.sessions_dir.mkdir(parents=True, exist_ok=True)
         self._current_session: Optional[Session] = None
+        self.sessions: Dict[str, Session] = {}  # Active sessions dict
 
     def create_session(self, cwd: Optional[Path] = None) -> Session:
         """Create a new session."""
         session = Session(cwd=cwd)
         self._current_session = session
+        self.sessions[session.session_id] = session  # Add to dict
         self._save_session(session)
         return session
+
+    def get_session(self, session_id: str) -> Optional[Session]:
+        """Get session by ID."""
+        return self.sessions.get(session_id)
+
+    def end_session(self, session_id: str) -> None:
+        """End and remove a session."""
+        if session_id in self.sessions:
+            del self.sessions[session_id]
 
     def load_session(self, session_id: str) -> Session | None:
         """Load a session by ID."""

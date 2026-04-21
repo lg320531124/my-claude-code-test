@@ -1,122 +1,186 @@
-"""Branch Command - Git branch management."""
+"""Branch Command - Manage git branches."""
 
 from __future__ import annotations
-import click
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
+import asyncio
+from pathlib import Path
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass, field
+from enum import Enum
 
-console = Console()
-
-
-@click.group("branch")
-def branch_group():
-    """Git branch management."""
-    pass
+from ..utils.git import GitManager, GitBranch
 
 
-@branch_group.command("list")
-@click.option("--remote", "-r", is_flag=True, help="Show remote branches")
-@click.option("--all", "-a", is_flag=True, help="Show all branches")
-def list_branches(remote: bool, all: bool):
+class BranchAction(Enum):
+    """Branch actions."""
+    LIST = "list"
+    CREATE = "create"
+    DELETE = "delete"
+    SWITCH = "switch"
+    MERGE = "merge"
+
+
+@dataclass
+class BranchOptions:
+    """Branch command options."""
+    action: BranchAction = BranchAction.LIST
+    name: Optional[str] = None
+    base: Optional[str] = None  # Base branch for create
+    force: bool = False
+    remote: bool = False
+
+
+async def run_branch(options: BranchOptions, cwd: Optional[Path] = None) -> Dict[str, Any]:
+    """Run branch command."""
+    git = GitManager(cwd or Path.cwd())
+    
+    if options.action == BranchAction.LIST:
+        return await _list_branches(git)
+    elif options.action == BranchAction.CREATE:
+        return await _create_branch(git, options)
+    elif options.action == BranchAction.DELETE:
+        return await _delete_branch(git, options)
+    elif options.action == BranchAction.SWITCH:
+        return await _switch_branch(git, options)
+    elif options.action == BranchAction.MERGE:
+        return await _merge_branch(git, options)
+    
+    return {"success": False, "error": f"Unknown action: {options.action}"}
+
+
+async def _list_branches(git: GitManager) -> Dict[str, Any]:
     """List branches."""
-    import subprocess
+    branches = await git.get_branches()
+    current = await git.get_branch()
+    
+    return {
+        "success": True,
+        "branches": [
+            {
+                "name": b.name,
+                "current": b.is_current,
+                "remote": b.is_remote,
+            }
+            for b in branches
+        ],
+        "current": current,
+    }
 
-    cmd = ["git", "branch"]
-    if all:
-        cmd.append("-a")
-    elif remote:
-        cmd.append("-r")
 
+async def _create_branch(git: GitManager, options: BranchOptions) -> Dict[str, Any]:
+    """Create new branch."""
+    if not options.name:
+        return {"success": False, "error": "Branch name required"}
+    
+    base = options.base or "main"
+    
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        branches = result.stdout.strip().split("\n")
-
-        table = Table(title="Branches")
-        table.add_column("Branch", style="cyan")
-        table.add_column("Status", style="white")
-
-        for branch in branches:
-            branch = branch.strip()
-            if branch.startswith("*"):
-                table.add_row(branch[1:].strip(), "[green]current[/green]")
-            else:
-                table.add_row(branch, "")
-
-        console.print(table)
-
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git error: {e.stderr}[/red]")
+        proc = await asyncio.create_subprocess_exec(
+            "git", "checkout", "-b", options.name, base,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(git.cwd),
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode == 0:
+            return {"success": True, "branch": options.name, "base": base}
+        else:
+            return {"success": False, "error": stderr.decode()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
-@branch_group.command("create")
-@click.argument("name")
-@click.option("--from", "-f", "from_branch", default=None, help="Create from branch")
-@click.option("--switch", "-s", is_flag=True, help="Switch to new branch")
-def create_branch(name: str, from_branch: Optional[str], switch: bool):
-    """Create a new branch."""
-    import subprocess
-
-    cmd = ["git", "branch", name]
-    if from_branch:
-        cmd.append(from_branch)
-
+async def _delete_branch(git: GitManager, options: BranchOptions) -> Dict[str, Any]:
+    """Delete branch."""
+    if not options.name:
+        return {"success": False, "error": "Branch name required"}
+    
+    flag = "-D" if options.force else "-d"
+    
     try:
-        subprocess.run(cmd, check=True)
-        console.print(f"[green]Created branch: {name}[/green]")
+        proc = await asyncio.create_subprocess_exec(
+            "git", "branch", flag, options.name,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(git.cwd),
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode == 0:
+            return {"success": True, "deleted": options.name}
+        else:
+            return {"success": False, "error": stderr.decode()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
-        if switch:
-            subprocess.run(["git", "checkout", name], check=True)
-            console.print(f"[green]Switched to: {name}[/green]")
 
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git error: {e.stderr}[/red]")
-
-
-@branch_group.command("switch")
-@click.argument("name")
-def switch_branch(name: str):
-    """Switch to a branch."""
-    import subprocess
-
+async def _switch_branch(git: GitManager, options: BranchOptions) -> Dict[str, Any]:
+    """Switch to branch."""
+    if not options.name:
+        return {"success": False, "error": "Branch name required"}
+    
     try:
-        subprocess.run(["git", "checkout", name], check=True)
-        console.print(f"[green]Switched to: {name}[/green]")
+        proc = await asyncio.create_subprocess_exec(
+            "git", "checkout", options.name,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(git.cwd),
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode == 0:
+            return {"success": True, "switched_to": options.name}
+        else:
+            return {"success": False, "error": stderr.decode()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git error: {e.stderr}[/red]")
 
-
-@branch_group.command("delete")
-@click.argument("name")
-@click.option("--force", "-f", is_flag=True, help="Force delete")
-def delete_branch(name: str, force: bool):
-    """Delete a branch."""
-    import subprocess
-
-    cmd = ["git", "branch", "-d" if not force else "-D", name]
-
+async def _merge_branch(git: GitManager, options: BranchOptions) -> Dict[str, Any]:
+    """Merge branch."""
+    if not options.name:
+        return {"success": False, "error": "Branch name required"}
+    
     try:
-        subprocess.run(cmd, check=True)
-        console.print(f"[green]Deleted branch: {name}[/green]")
-
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git error: {e.stderr}[/red]")
-
-
-@branch_group.command("rename")
-@click.argument("old_name")
-@click.argument("new_name")
-def rename_branch(old_name: str, new_name: str):
-    """Rename a branch."""
-    import subprocess
-
-    try:
-        subprocess.run(["git", "branch", "-m", old_name, new_name], check=True)
-        console.print(f"[green]Renamed: {old_name} → {new_name}[/green]")
-
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git error: {e.stderr}[/red]")
+        proc = await asyncio.create_subprocess_exec(
+            "git", "merge", options.name,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(git.cwd),
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode == 0:
+            return {"success": True, "merged": options.name}
+        else:
+            return {"success": False, "error": stderr.decode()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
-__all__ = ["branch_group"]
+class BranchCommand:
+    """Branch command implementation."""
+    
+    name = "branch"
+    description = "Manage git branches"
+    
+    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute branch command."""
+        options = BranchOptions(
+            action=BranchAction(args.get("action", "list")),
+            name=args.get("name"),
+            base=args.get("base"),
+            force=args.get("force", False),
+            remote=args.get("remote", False),
+        )
+        
+        cwd = Path(args.get("cwd", Path.cwd()))
+        return await run_branch(options, cwd)
+
+
+__all__ = [
+    "BranchAction",
+    "BranchOptions",
+    "run_branch",
+    "BranchCommand",
+]

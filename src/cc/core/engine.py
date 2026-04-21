@@ -328,7 +328,7 @@ class ToolExecutor:
             }
 
         # Validate input
-        validation = tool.validate_input(tool_input, ctx)
+        validation = await tool.validate_input(tool_input, ctx)
         if not validation.result:
             return {
                 "type": "tool_result",
@@ -479,7 +479,9 @@ class QueryEngine:
     def __init__(self, config: QueryEngineConfig):
         self.config = config
         self.mutable_messages = config.initial_messages or []
-        self.abort_controller = config.abort_controller or asyncio.Event()
+        # Lazy initialize abort_controller to avoid event loop requirement
+        self._abort_controller: Optional[asyncio.Event] = None
+        self._abort_controller_config = config.abort_controller
         self.permission_denials: List[SDKPermissionDenial] = []
         self.total_usage = EMPTY_USAGE
         self.read_file_state = config.read_file_cache
@@ -504,6 +506,22 @@ class QueryEngine:
 
         # Thinking config
         self.thinking_config = config.thinking_config or ThinkingConfig(type=ThinkingType.ADAPTIVE)
+
+    @property
+    def abort_controller(self) -> asyncio.Event:
+        """Get abort controller, creating lazily if needed."""
+        if self._abort_controller is None:
+            if self._abort_controller_config is not None:
+                self._abort_controller = self._abort_controller_config
+            else:
+                # Try to get running loop, create Event if available
+                try:
+                    loop = asyncio.get_running_loop()
+                    self._abort_controller = asyncio.Event()
+                except RuntimeError:
+                    # No running loop, use a placeholder that will be replaced
+                    self._abort_controller = asyncio.Event()  # Will work when loop is available
+        return self._abort_controller
 
     def _create_tool_use_context(self) -> ToolUseContext:
         """Create tool use context."""
@@ -703,6 +721,17 @@ class QueryEngine:
             "stats": self.stats.to_dict(),
             "permission_denials": len(self.permission_denials),
         }
+
+    def set_callbacks(
+        self,
+        on_text: Optional[Callable] = None,
+        on_tool_start: Optional[Callable] = None,
+        on_tool_result: Optional[Callable] = None,
+    ) -> None:
+        """Set callbacks for events."""
+        self._on_text = on_text
+        self._on_tool_start = on_tool_start
+        self._on_tool_result = on_tool_result
 
     def get_permission_denials(self) -> List[SDKPermissionDenial]:
         """Get permission denials for SDK reporting."""

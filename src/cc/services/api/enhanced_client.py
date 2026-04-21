@@ -31,6 +31,12 @@ class APIError:
     retry_after: Optional[float] = None
     recoverable: bool = True
 
+    def __post_init__(self):
+        """Set recoverable based on error type."""
+        # AUTH and MODEL errors are typically not recoverable
+        if self.type in (APIErrorType.AUTH, APIErrorType.MODEL) and self.recoverable:
+            self.recoverable = False
+
 
 @dataclass
 class RetryConfig:
@@ -61,14 +67,19 @@ class StreamingBuffer:
 
     def add(self, text: str) -> None:
         """Add text to buffer."""
+        # Trim oldest if needed
         if self.total_size + len(text) > self.max_size:
-            # Trim oldest
             while self.buffer and self.total_size + len(text) > self.max_size:
                 removed = self.buffer.pop(0)
                 self.total_size -= len(removed)
 
-        self.buffer.append(text)
-        self.total_size += len(text)
+        # Truncate new text if still over limit
+        if len(text) > self.max_size - self.total_size:
+            text = text[:self.max_size - self.total_size]
+
+        if text:
+            self.buffer.append(text)
+            self.total_size += len(text)
 
     def get_all(self) -> str:
         """Get all buffered content."""

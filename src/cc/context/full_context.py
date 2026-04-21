@@ -64,6 +64,7 @@ class ContextInfo:
     environment: EnvironmentInfo
     git: GitInfo
     project: ProjectInfo
+    cwd: Optional[Path] = None
     timestamp: float = field(default_factory=time.time)
 
 
@@ -466,7 +467,7 @@ def build_system_prompt_from_context(context: ContextInfo, scenario: str = "deve
     branch = context.git.branch or "unknown"
     status_summary = "clean" if not context.git.status else f"{len(context.git.staged_files)} staged, {len(context.git.unstaged_files)} unstaged"
     commits = ", ".join(context.git.recent_commits[:3]) if context.git.recent_commits else "none"
-    project_name = context.project.name or context.cwd.name
+    project_name = context.project.name or (context.cwd.name if context.cwd else "project")
 
     prompt = base.format(
         platform=context.environment.platform,

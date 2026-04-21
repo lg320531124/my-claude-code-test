@@ -1,154 +1,73 @@
-"""Synthetic Output Tool - Generate synthetic responses."""
+"""Synthetic Output Tool - Generate synthetic/placeholder output."""
 
 from __future__ import annotations
-import json
-import time
-from typing import Any, Dict, Optional
-from pydantic import BaseModel, Field
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass, field
+from enum import Enum
 
-from ..types.tool import ToolDef, ToolResult, ToolUseContext
+from ..types.tool import ToolDef, ToolResult, ToolInput, ToolUseContext
 
 
-class SyntheticInput(BaseModel):
-    """Input for SyntheticOutputTool."""
-    type: str = Field(description="Output type: text, code, json, markdown, error")
-    content: Optional[str] = Field(default=None, description="Base content to synthesize")
-    template: Optional[str] = Field(default=None, description="Template to use")
-    params: Optional[Dict[str, Any]] = Field(default=None, description="Parameters for synthesis")
+class SyntheticType(Enum):
+    """Types of synthetic output."""
+    TEXT = "text"
+    CODE = "code"
+    MARKDOWN = "markdown"
+    JSON = "json"
+
+
+@dataclass
+class SyntheticInput(ToolInput):
+    """Synthetic output input schema."""
+    type: str = "text"
+    length: int = 100
 
 
 class SyntheticOutputTool(ToolDef):
-    """Tool for generating synthetic outputs."""
-
+    """Tool to generate synthetic output for testing/demo."""
+    
     name = "SyntheticOutput"
-    description = "Generate synthetic outputs for testing and demonstrations"
     input_schema = SyntheticInput
-
-    _templates: Dict[str, str] = {
-        "code_python": "def {name}():\n    {body}\n    return {result}",
-        "code_typescript": "function {name}(): {type} {\n  {body}\n  return {result};\n}",
-        "json_response": '{"status": "{status}", "data": {data}, "message": "{message}"}',
-        "markdown_header": "# {title}\n\n{content}",
-        "error_generic": "Error: {error_type} - {message}",
-        "success_message": "Success: {action} completed in {duration}",
-    }
-
-    async def execute(self, input: SyntheticInput, ctx: Optional[ToolUseContext] = None) -> ToolResult:
-        """Execute synthetic output generation."""
-        output_type = input.type
-
-        if output_type == "text":
-            return self._generate_text(input)
-        elif output_type == "code":
-            return self._generate_code(input)
-        elif output_type == "json":
-            return self._generate_json(input)
-        elif output_type == "markdown":
-            return self._generate_markdown(input)
-        elif output_type == "error":
-            return self._generate_error(input)
-        else:
-            return ToolResult(
-                content=f"Unknown output type: {output_type}",
-                is_error=True
-            )
-
-    def _generate_text(self, input: SyntheticInput) -> ToolResult:
-        """Generate synthetic text."""
-        content = input.content or "Sample synthetic text output"
-        params = input.params or {}
-
-        # Apply transformations
-        if params.get("uppercase"):
-            content = content.upper()
-        if params.get("lowercase"):
-            content = content.lower()
-        if params.get("prefix"):
-            content = f"{params['prefix']} {content}"
-        if params.get("suffix"):
-            content = f"{content} {params['suffix']}"
-
-        return ToolResult(
-            content=content,
-            metadata={"type": "text", "params": params}
-        )
-
-    def _generate_code(self, input: SyntheticInput) -> ToolResult:
-        """Generate synthetic code."""
-        params = input.params or {}
-        language = params.get("language", "python")
-        template_key = f"code_{language}"
-
-        template = self._templates.get(template_key, self._templates["code_python"])
-
-        code = template.format(
-            name=params.get("name", "example_function"),
-            body=params.get("body", "# implementation"),
-            result=params.get("result", "None"),
-            type=params.get("return_type", "any"),
-        )
-
-        return ToolResult(
-            content=code,
-            metadata={"type": "code", "language": language}
-        )
-
-    def _generate_json(self, input: SyntheticInput) -> ToolResult:
-        """Generate synthetic JSON."""
-        params = input.params or {}
-        template = self._templates.get("json_response", '{"status": "ok"}')
-
-        # Create JSON structure
-        data = {
-            "status": params.get("status", "success"),
-            "timestamp": time.time(),
-            "data": params.get("data", {}),
-            "message": params.get("message", "Synthetic JSON response"),
+    
+    async def call(
+        self,
+        args: Dict[str, Any],
+        context: ToolUseContext,
+        can_use_tool: Any = None,
+        parent_message: Any = None,
+        on_progress: Optional[Any] = None,
+    ) -> ToolResult:
+        """Generate synthetic output."""
+        type_str = args.get("type", "text")
+        length = args.get("length", 100)
+        
+        # Generate based on type
+        outputs = {
+            "text": "This is synthetic text output for testing purposes.",
+            "code": "def example():\n    return 'synthetic code'",
+            "markdown": "# Synthetic Output\n\nThis is a **sample** markdown.",
+            "json": '{"status": "synthetic", "data": []}',
         }
-
-        if input.content:
-            data["content"] = input.content
-
-        return ToolResult(
-            content=json.dumps(data, indent=2),
-            metadata={"type": "json"}
-        )
-
-    def _generate_markdown(self, input: SyntheticInput) -> ToolResult:
-        """Generate synthetic markdown."""
-        params = input.params or {}
-        template = self._templates.get("markdown_header", "# Title\n\nContent")
-
-        markdown = template.format(
-            title=params.get("title", "Example"),
-            content=input.content or params.get("content", "Example content"),
-        )
-
-        # Add sections if specified
-        sections = params.get("sections", [])
-        for section in sections:
-            markdown += f"\n\n## {section['title']}\n{section['content']}"
-
-        return ToolResult(
-            content=markdown,
-            metadata={"type": "markdown"}
-        )
-
-    def _generate_error(self, input: SyntheticInput) -> ToolResult:
-        """Generate synthetic error."""
-        params = input.params or {}
-        template = self._templates.get("error_generic", "Error occurred")
-
-        error_msg = template.format(
-            error_type=params.get("error_type", "GenericError"),
-            message=params.get("message", input.content or "An error occurred"),
-        )
-
-        return ToolResult(
-            content=error_msg,
-            is_error=True,
-            metadata={"type": "error", "error_type": params.get("error_type")}
-        )
+        
+        output = outputs.get(type_str, outputs["text"])
+        return ToolResult(data=output[:length])
 
 
-__all__ = ["SyntheticOutputTool", "SyntheticInput"]
+# Tool registration
+_synthetic_tool: Optional[SyntheticOutputTool] = None
+
+
+def get_synthetic_tool() -> SyntheticOutputTool:
+    """Get global synthetic output tool."""
+    global _synthetic_tool
+    if _synthetic_tool is None:
+        _synthetic_tool = SyntheticOutputTool()
+    return _synthetic_tool
+
+
+__all__ = [
+    "SyntheticType",
+    "SyntheticInput",
+    "SyntheticOutputTool",
+    "get_synthetic_tool",
+]
