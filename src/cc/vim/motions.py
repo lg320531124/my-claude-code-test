@@ -4,7 +4,8 @@ Implements vim motion commands: h, j, k, l, w, b, e, 0, $, gg, G, etc.
 """
 
 from __future__ import annotations
-from typing import List
+import re
+from typing import List, Dict, Callable, Optional
 from . import VimState, MotionResult
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 from rich.console import Console
 from rich.prompt import Prompt
+from typing import Optional, Dict
 
 from ..utils.config import Config
 
