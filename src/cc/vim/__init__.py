@@ -5,9 +5,12 @@ for text editing in terminal interfaces.
 """
 
 from __future__ import annotations
+
 from enum import Enum
 from typing import Optional, Tuple
-from dataclasses import dataclass
+
+# Import MotionResult from motions first (needed for VimState type hints)
+from .motions import MotionResult  # noqa: E402
 
 
 class VimMode(Enum):
@@ -68,28 +71,12 @@ class VimState:
         self.reset_pending()
 
 
-@dataclass
-class MotionResult:
-    """Result of a vim motion."""
-    start: Tuple[int, int]
-    end: Tuple[int, int]
-    linewise: bool = False
-    exclusive: bool = False  # End position excluded
-
-
-@dataclass
-class OperatorResult:
-    """Result of a vim operator."""
-    text: str
-    register: str
-    cursor_pos: Tuple[int, int]
-
-
-# Import submodules
-from .motions import VimMotions, MOTION_REGISTRY
-from .operators import VimOperators, OperatorContext, OPERATOR_REGISTRY
-from .text_objects import VimTextObjects, TEXT_OBJECT_REGISTRY
-from .transitions import VimTransitions, TransitionResult
+# Import from submodules (after class definitions to avoid circular imports)
+from .operators import OperatorResult  # noqa: E402
+from .motions import VimMotions, MOTION_REGISTRY  # noqa: E402
+from .operators import VimOperators, OperatorContext, OPERATOR_REGISTRY  # noqa: E402
+from .text_objects import VimTextObjects, TEXT_OBJECT_REGISTRY  # noqa: E402
+from .transitions import VimTransitions, TransitionResult  # noqa: E402
 
 
 __all__ = [

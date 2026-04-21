@@ -180,7 +180,7 @@ class VimTextObjects:
         all_text = '\n'.join(lines)
 
         # Convert cursor position to text position
-        text_pos = sum(len(lines[l]) + 1 for l in range(line)) + col
+        text_pos = sum(len(lines[line_idx]) + 1 for line_idx in range(line)) + col
 
         # Find sentence boundaries
         # Sentence start: after .!? + space/tab/newline, or start of text
@@ -365,7 +365,7 @@ class VimTextObjects:
 
         # Search backward for opening tag
         all_text = '\n'.join(lines)
-        text_pos = sum(len(lines[l]) + 1 for l in range(line)) + col
+        text_pos = sum(len(lines[line_idx]) + 1 for line_idx in range(line)) + col
 
         # Find nearest opening tag before cursor
         best_match = None

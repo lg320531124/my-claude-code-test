@@ -5,14 +5,26 @@ Implements vim motion commands: h, j, k, l, w, b, e, 0, $, gg, G, etc.
 
 from __future__ import annotations
 import re
-from typing import List, Dict, Callable
-from . import VimState, MotionResult
+from typing import List, Dict, Callable, TYPE_CHECKING
+from dataclasses import dataclass
+
+if TYPE_CHECKING:
+    from . import VimState
+
+
+@dataclass
+class MotionResult:
+    """Result of a vim motion."""
+    start: tuple
+    end: tuple
+    linewise: bool = False
+    exclusive: bool = False  # End position excluded
 
 
 class VimMotions:
     """Vim motion commands."""
 
-    def __init__(self, state: VimState):
+    def __init__(self, state: "VimState"):
         self.state = state
 
     # Character motions
@@ -399,22 +411,22 @@ class VimMotions:
         for _ in range(count):
             found = False
             # Search from current position forward
-            for l in range(line, len(lines)):
-                start_col = col + 1 if l == line else 0
-                match = re.search(pattern, lines[l][start_col:])
+            for line_idx in range(line, len(lines)):
+                start_col = col + 1 if line_idx == line else 0
+                match = re.search(pattern, lines[line_idx][start_col:])
                 if match:
-                    line = l
+                    line = line_idx
                     col = start_col + match.start()
                     found = True
                     break
             if not found:
                 # Wrap around
-                for l in range(0, line + 1):
-                    start_col = 0 if l < line else 0
-                    end_col = col if l == line else len(lines[l])
-                    match = re.search(pattern, lines[l][start_col:end_col])
+                for line_idx in range(0, line + 1):
+                    start_col = 0 if line_idx < line else 0
+                    end_col = col if line_idx == line else len(lines[line_idx])
+                    match = re.search(pattern, lines[line_idx][start_col:end_col])
                     if match:
-                        line = l
+                        line = line_idx
                         col = start_col + match.start()
                         break
 
@@ -445,22 +457,22 @@ class VimMotions:
         for _ in range(count):
             found = False
             # Search from current position backward
-            for l in range(line, -1, -1):
+            for line_idx in range(line, -1, -1):
                 start_col = 0
-                end_col = col if l == line else len(lines[l])
+                end_col = col if line_idx == line else len(lines[line_idx])
                 # Find all matches and take last one
-                matches = list(re.finditer(pattern, lines[l][start_col:end_col]))
+                matches = list(re.finditer(pattern, lines[line_idx][start_col:end_col]))
                 if matches:
-                    line = l
+                    line = line_idx
                     col = start_col + matches[-1].start()
                     found = True
                     break
             if not found:
                 # Wrap around
-                for l in range(len(lines) - 1, line):
-                    matches = list(re.finditer(pattern, lines[l]))
+                for line_idx in range(len(lines) - 1, line):
+                    matches = list(re.finditer(pattern, lines[line_idx]))
                     if matches:
-                        line = l
+                        line = line_idx
                         col = matches[-1].start()
                         break
 

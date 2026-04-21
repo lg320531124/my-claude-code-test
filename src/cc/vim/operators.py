@@ -4,9 +4,13 @@ Implements vim operators: d (delete), y (yank), c (change), p (put), etc.
 """
 
 from __future__ import annotations
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, TYPE_CHECKING
 from dataclasses import dataclass
-from . import VimState, VimMode, MotionResult, OperatorResult
+from .motions import MotionResult
+from . import VimMode
+
+if TYPE_CHECKING:
+    from . import VimState
 
 
 @dataclass
@@ -18,10 +22,18 @@ class OperatorContext:
     register: str
 
 
+@dataclass
+class OperatorResult:
+    """Result of a vim operator."""
+    text: str
+    register: str
+    cursor_pos: tuple
+
+
 class VimOperators:
     """Vim operator commands."""
 
-    def __init__(self, state: VimState):
+    def __init__(self, state: "VimState"):
         self.state = state
         self.registers: Dict[str, str] = {}
         self.register_types: Dict[str, str] = {}  # 'linewise' or 'charwise'
@@ -68,8 +80,8 @@ class VimOperators:
 
                 text_parts = []
                 text_parts.append(ctx.lines[start_line][start_col:])
-                for l in range(start_line + 1, end_line):
-                    text_parts.append(ctx.lines[l])
+                for line_idx in range(start_line + 1, end_line):
+                    text_parts.append(ctx.lines[line_idx])
                 text_parts.append(ctx.lines[end_line][:end_col + (0 if ctx.motion_result.exclusive else 1)])
                 text = '\n'.join(text_parts)
 
@@ -110,8 +122,8 @@ class VimOperators:
             else:
                 text_parts = []
                 text_parts.append(ctx.lines[start_line][start_col:])
-                for l in range(start_line + 1, end_line):
-                    text_parts.append(ctx.lines[l])
+                for line_idx in range(start_line + 1, end_line):
+                    text_parts.append(ctx.lines[line_idx])
                 text_parts.append(ctx.lines[end_line][:end_col + (0 if ctx.motion_result.exclusive else 1)])
                 text = '\n'.join(text_parts)
 
@@ -332,9 +344,9 @@ class VimOperators:
         indent = '    ' * count  # 4 spaces per indent level
 
         new_lines = ctx.lines.copy()
-        for l in range(start_line, end_line + 1):
-            if l < len(new_lines):
-                new_lines[l] = indent + new_lines[l]
+        for line_idx in range(start_line, end_line + 1):
+            if line_idx < len(new_lines):
+                new_lines[line_idx] = indent + new_lines[line_idx]
 
         return OperatorResult(
             text='',
@@ -350,15 +362,15 @@ class VimOperators:
         remove_spaces = 4 * count
 
         new_lines = ctx.lines.copy()
-        for l in range(start_line, end_line + 1):
-            if l < len(new_lines):
+        for line_idx in range(start_line, end_line + 1):
+            if line_idx < len(new_lines):
                 # Remove leading spaces/tabs
-                line_text = new_lines[l]
+                line_text = new_lines[line_idx]
                 removed = 0
                 while removed < remove_spaces and line_text and (line_text[0] == ' ' or line_text[0] == '\t'):
                     line_text = line_text[1:]
                     removed += 1
-                new_lines[l] = line_text
+                new_lines[line_idx] = line_text
 
         return OperatorResult(
             text='',
@@ -380,8 +392,8 @@ class VimOperators:
             # Lowercase first line from start_col
             new_lines[start_line] = ctx.lines[start_line][:start_col] + ctx.lines[start_line][start_col:].lower()
             # Lowercase middle lines
-            for l in range(start_line + 1, end_line):
-                new_lines[l] = ctx.lines[l].lower()
+            for line_idx in range(start_line + 1, end_line):
+                new_lines[line_idx] = ctx.lines[line_idx].lower()
             # Lowercase last line to end_col
             new_lines[end_line] = ctx.lines[end_line][:end_col + (1 if not ctx.motion_result.exclusive else 0)].lower() + ctx.lines[end_line][end_col + (1 if not ctx.motion_result.exclusive else 0):]
 
@@ -405,8 +417,8 @@ class VimOperators:
             # Uppercase first line from start_col
             new_lines[start_line] = ctx.lines[start_line][:start_col] + ctx.lines[start_line][start_col:].upper()
             # Uppercase middle lines
-            for l in range(start_line + 1, end_line):
-                new_lines[l] = ctx.lines[l].upper()
+            for line_idx in range(start_line + 1, end_line):
+                new_lines[line_idx] = ctx.lines[line_idx].upper()
             # Uppercase last line to end_col
             new_lines[end_line] = ctx.lines[end_line][:end_col + (1 if not ctx.motion_result.exclusive else 0)].upper() + ctx.lines[end_line][end_col + (1 if not ctx.motion_result.exclusive else 0):]
 
