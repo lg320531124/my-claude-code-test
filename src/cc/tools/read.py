@@ -18,7 +18,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, Any, Optional, Set, List, Tuple
+from typing import List, Dict, Optional, Any, Callable, Dict, Any, Optional, Set, List, Tuple
 from enum import Enum
 
 from pydantic import BaseModel, Field

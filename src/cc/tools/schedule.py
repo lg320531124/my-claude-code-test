@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 import time
-from typing import ClassVar, Callable, Optional
+from typing import List, Dict, Optional, Any, Callable, ClassVar, Callable, Optional
 from dataclasses import dataclass
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
