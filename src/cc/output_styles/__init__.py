@@ -10,7 +10,7 @@ Provides multiple output formatting styles:
 
 from __future__ import annotations
 from enum import Enum
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, List, Callable
 from dataclasses import dataclass
 
 

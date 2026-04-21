@@ -9,7 +9,6 @@ Provides skill registration, discovery, and execution:
 
 from __future__ import annotations
 import asyncio
-import json
 from pathlib import Path
 from typing import Dict, Any, Optional, Callable, List
 from dataclasses import dataclass, field

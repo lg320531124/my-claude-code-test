@@ -8,8 +8,7 @@ Provides visual representation of:
 """
 
 from __future__ import annotations
-import asyncio
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum

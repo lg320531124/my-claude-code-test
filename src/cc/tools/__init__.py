@@ -70,6 +70,7 @@ __all__ = [
     "LSPTool",
     "MCPTool",
     "CronCreateTool",
+    "get_scheduler",
     "SyntheticOutputTool",
     "SyntheticInput",
     "PowerShellTool",

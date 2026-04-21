@@ -7,12 +7,9 @@ and async operations in the REPL context.
 from __future__ import annotations
 import asyncio
 from typing import Any, Callable, Optional, Dict, List, AsyncIterator
-from dataclasses import dataclass, field
-from enum import Enum
 
 # Import hook types from services
 from ..services.hooks.hooks_system import HookType, HookContext, HookResult, get_hook_manager
-from .advanced import HookResult as AdvancedHookResult
 
 # Import new hook modules
 from .permissions import (
@@ -646,11 +643,13 @@ __all__ = [
     "ClipboardContent",
     "ClipboardHook",
     "get_clipboard_hook",
+    "use_clipboard",
     # Notification hooks
     "NotificationLevel",
     "NotificationMessage",
     "NotificationHook",
     "get_notification_hook",
+    "use_notifications",
     # Diff hooks
     "DiffType",
     "DiffOperation",
@@ -658,12 +657,14 @@ __all__ = [
     "DiffResult",
     "DiffHook",
     "get_diff_hook",
+    "use_diff",
     # Search hooks
     "SearchType",
     "SearchMatch",
     "SearchResult",
     "SearchHook",
     "get_search_hook",
+    "use_search",
     # Global state hooks
     "GlobalState",
     "GlobalHook",
@@ -676,14 +677,17 @@ __all__ = [
     "BackgroundTask",
     "BackgroundHook",
     "get_background_hook",
+    "use_background",
     # Schedule hooks
     "ScheduleType",
     "ScheduledJob",
     "ScheduleHook",
     "get_schedule_hook",
+    "use_schedule",
     # Session hooks
     "SessionState",
     "SessionData",
     "SessionHook",
     "get_session_hook",
+    "use_session",
 ]

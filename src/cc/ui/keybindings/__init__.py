@@ -3,9 +3,8 @@
 from __future__ import annotations
 import asyncio
 from typing import Dict, Any, Optional, List, Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 
 from .parser import KeyParser, KeyBinding, KeySequence, KeyModifier
 

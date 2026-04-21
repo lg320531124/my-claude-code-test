@@ -1,12 +1,10 @@
 """Prompt Suggestion - Suggest prompts to user."""
 
 from __future__ import annotations
-import asyncio
 import random
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime
 from pathlib import Path
 
 from ...utils.log import get_logger

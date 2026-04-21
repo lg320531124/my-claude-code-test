@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 from enum import Enum
-from typing import Optional, ClassVar, Dict, List
+from typing import ClassVar, Dict, List
 
 # Try to import textual-dependent widgets
 try:
     from textual.widget import Widget
     from textual.containers import Horizontal, Vertical, VerticalScroll
     from textual.widgets import Static, Button, Label, Input, ProgressBar, DataTable
-    from textual.reactive import reactive
-    from textual.message import Message
     from rich.text import Text
     from rich.syntax import Syntax
     from rich.markdown import Markdown

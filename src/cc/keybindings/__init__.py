@@ -7,8 +7,8 @@ modes, and integration with vim and TUI systems.
 from __future__ import annotations
 import asyncio
 import platform
-from typing import Dict, Callable, Optional, Any, List, Tuple, Set
-from dataclasses import dataclass, field
+from typing import Dict, Callable, Optional, Any, List, Tuple
+from dataclasses import dataclass
 from enum import Enum
 from collections import defaultdict
 

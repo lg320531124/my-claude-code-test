@@ -169,6 +169,10 @@ __all__ = [
     # Config
     "Config",
     # Shell
+    "ShellDetector",
+    "ShellInfo",
+    "ShellType",
+    "get_shell_detector",
     "run_command",
     # File
     "get_file_info",

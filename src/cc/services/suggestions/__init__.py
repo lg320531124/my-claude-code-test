@@ -1,16 +1,10 @@
 """Prompt Suggestions - Async prompt suggestion service."""
 
 from __future__ import annotations
-import asyncio
-import json
-import re
 from pathlib import Path
 from typing import Dict, Any, Optional, List
-from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-
-import aiofiles
 
 
 class SuggestionType(Enum):

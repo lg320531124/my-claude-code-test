@@ -7,10 +7,9 @@ Provides messaging, permission callbacks, and status management.
 from __future__ import annotations
 import asyncio
 import json
-from typing import Dict, Any, Optional, Callable, AsyncIterator
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, Callable
+from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 
 
 class BridgeStatus(Enum):

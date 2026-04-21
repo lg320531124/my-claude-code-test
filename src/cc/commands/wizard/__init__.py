@@ -1,7 +1,6 @@
 """Commands Wizard - Interactive setup wizards."""
 
 from __future__ import annotations
-import asyncio
 import json
 from typing import Dict, Any, List, Optional, Callable
 from pathlib import Path

@@ -6,7 +6,7 @@ for text editing in terminal interfaces.
 
 from __future__ import annotations
 from enum import Enum
-from typing import Optional, Tuple, List, Callable, Dict, Any
+from typing import Optional, Tuple
 from dataclasses import dataclass
 
 
