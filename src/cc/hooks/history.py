@@ -1,9 +1,8 @@
 """Hook History - Async history search."""
 
 from __future__ import annotations
-import asyncio
 import re
-from typing import Dict, Any, Optional, List, Callable, AsyncIterator
+from typing import Dict, Any, Optional, List
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field

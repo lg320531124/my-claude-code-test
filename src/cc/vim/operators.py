@@ -4,8 +4,7 @@ Implements vim operators: d (delete), y (yank), c (change), p (put), etc.
 """
 
 from __future__ import annotations
-import re
-from typing import List, Tuple, Dict, Callable, Any
+from typing import List, Dict, Callable
 from dataclasses import dataclass
 from . import VimState, VimMode, MotionResult, OperatorResult
 

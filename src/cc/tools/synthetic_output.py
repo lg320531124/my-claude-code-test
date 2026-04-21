@@ -1,8 +1,8 @@
 """Synthetic Output Tool - Generate synthetic/placeholder output."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from enum import Enum
 
 from ..types.tool import ToolDef, ToolResult, ToolInput, ToolUseContext

@@ -7,7 +7,6 @@ from typing import AsyncIterator, Dict, Any, Optional, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ..utils.async_http import fetch_sse_stream
 
 
 class SSEEventType(Enum):

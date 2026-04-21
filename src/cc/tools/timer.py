@@ -3,7 +3,7 @@
 from __future__ import annotations
 import time
 import asyncio
-from typing import ClassVar, Optional, Callable, Any
+from typing import ClassVar, Optional, Callable
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext

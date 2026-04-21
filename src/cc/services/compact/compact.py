@@ -1,10 +1,8 @@
 """Compact Service - Context compression for managing conversation length."""
 
 from __future__ import annotations
-import asyncio
 import time
-from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
+from typing import Callable, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 

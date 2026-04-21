@@ -1,13 +1,11 @@
 """System Prompt Builder - Build system prompts for Claude."""
 
 from __future__ import annotations
-import asyncio
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 from datetime import datetime
 
-from .claude_md import load_claude_md_context, extract_instructions
-from .async_io import read_file_async, exists_async
+from .claude_md import load_claude_md_context
 
 
 class SystemPromptBuilder:

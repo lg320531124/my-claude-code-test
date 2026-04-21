@@ -1,12 +1,10 @@
 """Permission Dialogs - Permission confirmation dialogs."""
 
 from __future__ import annotations
-from textual.widget import Widget
-from textual.widgets import Static, Button, Input
+from textual.widgets import Static, Button
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen
-from rich.text import Text
 
 
 class PermissionDialog(ModalScreen):

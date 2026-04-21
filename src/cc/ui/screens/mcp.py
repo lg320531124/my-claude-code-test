@@ -1,15 +1,12 @@
 """MCP Screen - MCP server management interface."""
 
 from __future__ import annotations
-import asyncio
-from textual.widget import Widget
-from textual.widgets import Static, Button, DataTable, Input, Tree
+from textual.widgets import Static, DataTable, Tree
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import Screen
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, VerticalScroll
-from rich.text import Text
+from textual.containers import Container
 
 
 class MCPScreen(Screen):

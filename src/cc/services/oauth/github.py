@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 import asyncio
-import base64
-import hashlib
 import secrets
 import time
-from typing import Dict, Any, Optional, Callable
+from typing import Dict, Any, Optional
 from dataclasses import dataclass
-from urllib.parse import urlencode, parse_qs
+from urllib.parse import urlencode
 
 
 @dataclass

@@ -1,7 +1,6 @@
 """Thinking Module - Extended thinking budget management."""
 
 from __future__ import annotations
-import asyncio
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum

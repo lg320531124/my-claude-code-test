@@ -4,8 +4,7 @@ Async tool for reading content from MCP server resources.
 """
 
 from __future__ import annotations
-import asyncio
-from typing import ClassVar, Dict, Any, Optional, Callable
+from typing import Dict, Any, Optional, Callable
 
 from pydantic import BaseModel, Field
 

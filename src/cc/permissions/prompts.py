@@ -1,7 +1,6 @@
 """Enhanced Permission Prompter with persistence."""
 
 from __future__ import annotations
-import asyncio
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -10,7 +9,7 @@ from rich.prompt import Prompt
 from rich.table import Table
 from rich.panel import Panel
 
-from ..types.permission import PermissionDecision, PermissionResult
+from ..types.permission import PermissionDecision
 from .persistence import PermissionPersistence, SessionMemory, hash_input
 
 

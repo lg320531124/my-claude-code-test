@@ -1,9 +1,8 @@
 """Onboarding Screen - New user introduction."""
 
 from __future__ import annotations
-import asyncio
 from textual.widget import Widget
-from textual.widgets import Static, Button, Input, ProgressBar
+from textual.widgets import Static, Button, ProgressBar
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import Screen

@@ -3,10 +3,10 @@
 from __future__ import annotations
 import asyncio
 from typing import Dict, Callable, Optional, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
-from ..services.hooks import Hook, HookType, HookContext, HookResult, get_hook_manager
+from ..services.hooks import HookType, HookContext, HookResult, get_hook_manager
 
 
 class KeyMode(Enum):

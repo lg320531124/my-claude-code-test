@@ -5,7 +5,7 @@ Implements vim text objects: aw, iw, ap, ip, a(, i(, a[, i[, a{, i{, at, it, etc
 
 from __future__ import annotations
 import re
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 from . import MotionResult
 
 

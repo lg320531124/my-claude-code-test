@@ -3,8 +3,8 @@
 from __future__ import annotations
 import difflib
 from pathlib import Path
-from typing import ClassVar, Optional, List
-from pydantic import BaseModel, Field
+from typing import ClassVar
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

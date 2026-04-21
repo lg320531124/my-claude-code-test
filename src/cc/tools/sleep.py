@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import asyncio
-from typing import Any, Optional
+from typing import Optional
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolResult, ToolUseContext

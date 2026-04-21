@@ -5,7 +5,7 @@ import asyncio
 import json
 import subprocess
 from pathlib import Path
-from typing import ClassVar, Any, Callable, Optional
+from typing import ClassVar, Optional
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

@@ -1,11 +1,10 @@
 """Keybindings Parser - Parse keybinding configurations."""
 
 from __future__ import annotations
-import re
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Callable
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass
 from enum import Enum
 
 

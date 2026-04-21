@@ -3,11 +3,10 @@
 from __future__ import annotations
 import asyncio
 from pathlib import Path
-from typing import Optional, List
+from typing import List
 from rich.console import Console
 from rich.table import Table
 
-from ..utils.async_http import AsyncHTTPClient
 from ..utils.async_process import run_command_async
 from ..utils.async_io import exists_async, read_file_async, write_file_async
 
@@ -59,7 +58,7 @@ async def connect_ssh(console: Console, host: str) -> None:
     # Parse SSH URL
     host = host.replace("ssh://", "")
 
-    console.print(f"\n[dim]Establishing SSH connection...[/]")
+    console.print("\n[dim]Establishing SSH connection...[/]")
 
     # Test connection
     result = await run_command_async(
@@ -83,13 +82,13 @@ async def connect_ssh(console: Console, host: str) -> None:
         await write_file_async(config_path, json.dumps(teleport_config, indent=2))
 
     else:
-        console.print(f"[red]✗ Connection failed[/]")
+        console.print("[red]✗ Connection failed[/]")
         console.print(f"[dim]{result.stderr[:100]}[/]")
 
 
 async def connect_vscode(console: Console, host: str) -> None:
     """Connect via VS Code Remote."""
-    console.print(f"\n[yellow]VS Code Remote connection[/]")
+    console.print("\n[yellow]VS Code Remote connection[/]")
     console.print("[dim]Would open VS Code with remote extension[/]")
 
     # Would invoke VS Code
@@ -129,7 +128,7 @@ async def teleport_status(console: Console) -> None:
         config = json.loads(content)
 
         if config.get("connected"):
-            console.print(f"[green]✓ Connected[/]")
+            console.print("[green]✓ Connected[/]")
             console.print(f"  Host: {config.get('host', 'unknown')}")
             console.print(f"  Protocol: {config.get('protocol', 'unknown')}")
         else:

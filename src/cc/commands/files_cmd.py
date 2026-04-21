@@ -1,18 +1,14 @@
 """Files Command - File management operations."""
 
 from __future__ import annotations
-import asyncio
 from pathlib import Path
 from typing import Optional, List
 from rich.console import Console
 from rich.table import Table
 
 from ..utils.async_io import (
-    read_file_async,
-    write_file_async,
     exists_async,
     stat_async,
-    mkdir_async,
 )
 from ..utils.async_process import run_command_async
 

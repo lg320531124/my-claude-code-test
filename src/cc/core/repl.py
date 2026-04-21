@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 import asyncio
-import sys
-from pathlib import Path
 from typing import Callable, Optional
 
 from rich.console import Console
-from rich.live import Live
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
 from rich.text import Text
 
 from ..core.engine import QueryEngine

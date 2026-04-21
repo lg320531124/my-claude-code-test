@@ -1,7 +1,7 @@
 """Permission Bar Widget - Permission prompt display."""
 
 from __future__ import annotations
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 

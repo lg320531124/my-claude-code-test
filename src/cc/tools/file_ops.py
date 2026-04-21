@@ -3,8 +3,8 @@
 from __future__ import annotations
 import shutil
 from pathlib import Path
-from typing import ClassVar, Optional
-from pydantic import BaseModel, Field
+from typing import ClassVar
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 from ..types.permission import PermissionResult, PermissionDecision

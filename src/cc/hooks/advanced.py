@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import asyncio
-from typing import Dict, Any, Optional, Callable, List
+from typing import Dict, Any, Callable, List
 from dataclasses import dataclass
 from datetime import datetime
 

@@ -189,7 +189,7 @@ class PromptSuggester:
                 type=SuggestionType.TASK,
                 priority=SuggestionPriority.HIGH,
                 confidence=0.9,
-                context=f"Error detected",
+                context="Error detected",
             ))
 
         return suggestions

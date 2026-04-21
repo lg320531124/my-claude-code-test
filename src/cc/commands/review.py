@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import re
 from pathlib import Path
-from typing import Optional, ClassVar
+from typing import Optional
 from dataclasses import dataclass
 
 from rich.console import Console

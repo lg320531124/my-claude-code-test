@@ -1,8 +1,8 @@
 """Tool Search - Search for available tools."""
 
 from __future__ import annotations
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 
 from ..types.tool import ToolDef, ToolResult, ToolInput, ToolUseContext
 

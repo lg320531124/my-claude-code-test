@@ -1,8 +1,7 @@
 """REPL Tool - Interactive REPL control."""
 
 from __future__ import annotations
-import asyncio
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

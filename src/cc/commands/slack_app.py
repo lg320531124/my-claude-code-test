@@ -1,13 +1,11 @@
 """Slack App Command - Slack integration management."""
 
 from __future__ import annotations
-import asyncio
-from pathlib import Path
-from typing import Optional, List
+from typing import List
 from rich.console import Console
 from rich.table import Table
 
-from ..utils.async_http import AsyncHTTPClient, fetch_json
+from ..utils.async_http import AsyncHTTPClient
 
 
 async def run_slack_app(console: Console, action: str, args: List[str]) -> None:

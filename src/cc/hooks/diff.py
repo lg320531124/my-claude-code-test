@@ -3,10 +3,9 @@
 from __future__ import annotations
 import asyncio
 import difflib
-from typing import Any, Dict, List, Optional, Tuple, AsyncIterator
+from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 
 
 class DiffType(Enum):
@@ -78,7 +77,7 @@ class DiffHook:
             async with asyncio.Lock():
                 old_content = await self._read_file(old_path)
                 new_content = await self._read_file(new_path)
-        except Exception as e:
+        except Exception:
             return DiffResult(
                 old_path=old_path,
                 new_path=new_path,

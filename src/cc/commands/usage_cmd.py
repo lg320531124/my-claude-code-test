@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 import asyncio
-import time
-from pathlib import Path
-from typing import ClassVar
 
 from rich.console import Console
 from rich.table import Table
@@ -13,7 +10,6 @@ from rich.panel import Panel
 
 async def show_usage_async(console: Console, period: str = "session") -> None:
     """Show usage statistics."""
-    from ..core.engine import QueryEngine
 
     # This would normally read from actual usage data
     # For now, show placeholder with structure
@@ -51,9 +47,9 @@ async def show_usage_async(console: Console, period: str = "session") -> None:
 
     # Cost estimation
     console.print(Panel(
-        f"Session Cost: $0.00\n"
-        f"Daily Cost: $0.00\n"
-        f"Monthly Est: $0.00",
+        "Session Cost: $0.00\n"
+        "Daily Cost: $0.00\n"
+        "Monthly Est: $0.00",
         title="Cost Estimation",
         border_style="blue",
     ))

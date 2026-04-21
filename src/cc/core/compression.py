@@ -1,12 +1,11 @@
 """Compression Utilities - Async context compression."""
 
 from __future__ import annotations
-import asyncio
-from typing import Dict, Any, List, Optional
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 
-from ..services.token_estimation import estimate_tokens, estimate_messages_tokens
+from ..services.token_estimation import estimate_messages_tokens
 
 
 class CompressionStrategy(Enum):

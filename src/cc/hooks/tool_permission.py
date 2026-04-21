@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 import asyncio
-from typing import Dict, Any, Optional, Callable
+from typing import Dict
 from dataclasses import dataclass
 
-from ..services.hooks import Hook, HookType, HookContext, HookResult, get_hook_manager
+from ..services.hooks import HookType, HookContext, HookResult, get_hook_manager
 from ..tools.shared.permissions import check_tool_permission, check_bash_permission
 
 

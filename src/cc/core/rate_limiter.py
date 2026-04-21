@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 import time
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 

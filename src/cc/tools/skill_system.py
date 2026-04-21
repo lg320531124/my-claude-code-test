@@ -5,7 +5,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import ClassVar, Any, Callable, Optional, List, Dict
+from typing import Callable, Optional, List, Dict
 from dataclasses import dataclass, field
 from pydantic import BaseModel, ValidationError, Field
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from datetime import datetime
-from typing import Any, Dict, Literal, Optional, Union, List
+from typing import Any, Dict, Literal, Optional, List
 
 from pydantic import BaseModel, Field
 

@@ -1,11 +1,10 @@
 """Session Memory Service - Persistent memory across sessions."""
 
 from __future__ import annotations
-import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
+from typing import Optional
 from dataclasses import dataclass, field
 from enum import Enum
 

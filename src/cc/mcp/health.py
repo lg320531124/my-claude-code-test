@@ -4,11 +4,11 @@ from __future__ import annotations
 import asyncio
 import time
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
-from dataclasses import dataclass, field
+from typing import Callable, Optional
+from dataclasses import dataclass
 from enum import Enum
 
-from .client import MCPConnection, MCPManager, get_mcp_manager
+from .client import MCPConnection, get_mcp_manager
 
 
 class ServerHealthStatus(Enum):
@@ -85,7 +85,7 @@ class MCPHealthMonitor:
                 await asyncio.sleep(self.config.check_interval_seconds)
             except asyncio.CancelledError:
                 break
-            except Exception as e:
+            except Exception:
                 # Log error but continue monitoring
                 await asyncio.sleep(self.config.check_interval_seconds)
 

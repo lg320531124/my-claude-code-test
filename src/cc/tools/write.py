@@ -13,16 +13,13 @@ Ported from TypeScript FileWriteTool.ts patterns:
 
 from __future__ import annotations
 import os
-import time
-import asyncio
 from pathlib import Path
-from typing import ClassVar, Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List, Callable
 
 from pydantic import BaseModel, Field
 
 from ..types.tool import Tool, ToolInput, ToolResult, ToolUseContext, ValidationResult
 from ..types.permission import PermissionResult, PermissionDecision
-from ..types.message import ToolResultBlock
 from ..utils.async_io import (
     write_file_async,
     read_file_async,

@@ -4,9 +4,8 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
+from typing import Any, Callable, Optional
 
-import httpx
 
 
 class MCPConnection:
@@ -59,7 +58,7 @@ class MCPConnection:
 
             return False
 
-        except Exception as e:
+        except Exception:
             self.connected = False
             return False
 

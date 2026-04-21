@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 import asyncio
-import os
 import shutil
 import tempfile
 from pathlib import Path
 from typing import List, Optional, Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

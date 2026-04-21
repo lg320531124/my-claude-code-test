@@ -3,7 +3,6 @@
 from __future__ import annotations
 import json
 import time
-from typing import Any
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -124,10 +123,10 @@ class AutoDreamService:
         sections.append(f"Problem: {context.problem}")
 
         if context.constraints:
-            sections.append(f"Constraints:\n- " + "\n- ".join(context.constraints))
+            sections.append("Constraints:\n- " + "\n- ".join(context.constraints))
 
         if context.preferences:
-            sections.append(f"Preferences:\n- " + "\n- ".join(context.preferences))
+            sections.append("Preferences:\n- " + "\n- ".join(context.preferences))
 
         # Generate steps based on type
         if type == DreamType.SOLUTION:

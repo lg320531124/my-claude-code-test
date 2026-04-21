@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 import json
-import asyncio
 from pathlib import Path
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from enum import Enum
 
 from ..core.session import SessionManager
@@ -103,12 +102,12 @@ def _export_markdown(session: Any, options: ExportOptions) -> str:
     """Export as Markdown."""
     lines = [
         f"# Session {session.id}",
-        f"",
+        "",
         f"**Directory:** {session.cwd}",
         f"**Created:** {session.created_at}",
-        f"",
+        "",
         "---",
-        f"",
+        "",
     ]
     
     for i, msg in enumerate(session.messages, 1):

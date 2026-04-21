@@ -1,8 +1,6 @@
 """CLI subcommands: init, config, version."""
 
 from __future__ import annotations
-import os
-import sys
 from pathlib import Path
 
 import click
@@ -11,7 +9,6 @@ from rich.prompt import Prompt
 from rich.table import Table
 
 from ..utils.config import Config
-from ..types.permission import PermissionDecision
 
 console = Console()
 

@@ -1,7 +1,7 @@
 """Wizard Tool - Step-by-step wizard operations."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 

@@ -13,23 +13,20 @@ Ported from TypeScript FileReadTool/FileReadTool.ts patterns:
 """
 
 from __future__ import annotations
-import asyncio
 import base64
 import json
 import os
 import re
-import time
 from pathlib import Path
-from typing import ClassVar, Dict, Any, Optional, Set, List, Union, Tuple
-from dataclasses import dataclass
+from typing import Dict, Any, Optional, Set, List, Tuple
 from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from ..types.tool import Tool, ToolDef, ToolInput, ToolResult, ToolUseContext, ValidationResult
+from ..types.tool import Tool, ToolInput, ToolResult, ToolUseContext, ValidationResult
 from ..types.permission import PermissionResult, PermissionDecision
-from ..types.message import ContentBlock, ToolResultBlock
-from ..utils.async_io import read_file_async, read_file_binary_async, stat_async, exists_async
+from ..types.message import ToolResultBlock
+from ..utils.async_io import read_file_async, read_file_binary_async, stat_async
 
 
 # Constants
@@ -621,7 +618,7 @@ class ReadTool(Tool):
             return ToolResult(
                 data=ReadOutput(
                     type="text",
-                    file={"error": f"Notebook too large. Use Bash with jq to read specific cells."},
+                    file={"error": "Notebook too large. Use Bash with jq to read specific cells."},
                 ),
                 is_error=True,
             )

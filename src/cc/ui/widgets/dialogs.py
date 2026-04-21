@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from textual.widget import Widget
-from textual.containers import Center, Middle
 from textual.widgets import Static, Button, Input
 from textual.reactive import reactive
 from textual.message import Message

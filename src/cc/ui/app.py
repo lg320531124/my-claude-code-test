@@ -3,21 +3,18 @@
 from __future__ import annotations
 import asyncio
 import time
-from pathlib import Path
-from typing import Optional, ClassVar
+from typing import Optional
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll
-from textual.widgets import Header, Footer, Static, Input, Button, Label, ProgressBar
-from textual.screen import Screen, ModalScreen
+from textual.containers import Container, VerticalScroll
+from textual.widgets import Header, Footer, Static, Input, Label
+from textual.screen import Screen
 from textual.reactive import reactive
 from textual.message import Message
 from textual.events import Key
 from textual.css.query import NoMatches
-from rich.markdown import Markdown
 from rich.text import Text
-from rich.syntax import Syntax
 
 from ..core.engine import QueryEngine
 from ..core.session import Session, SessionManager
@@ -36,7 +33,6 @@ from .screens import (
     StatsScreen,
     MessageHistoryScreen,
     DoctorScreen,
-    ConfigScreen,
 )
 from .widgets import (
     ThemeManager,
@@ -44,11 +40,7 @@ from .widgets import (
     VimModeIndicator,
     VimHandler,
     StatusWidget,
-    TokenCounterWidget,
     ToolProgressWidget,
-    MessageListWidget,
-    ThemeSelectorWidget,
-    CommandPaletteWidget,
 )
 
 

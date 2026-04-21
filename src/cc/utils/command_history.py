@@ -1,14 +1,12 @@
 """Command History - Track and manage command history."""
 
 from __future__ import annotations
-import asyncio
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass, field
 from collections import deque
 import json
-import os
 
 from .log import get_logger
 

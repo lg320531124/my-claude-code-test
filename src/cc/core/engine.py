@@ -25,22 +25,19 @@ from typing import AsyncIterator, Any, Callable, Optional, Dict, List, Set, Unio
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ..services.api.client import APIClient, get_client
+from ..services.api.client import get_client
 from ..types.message import (
     AssistantMessage,
     ContentBlock,
     Message,
     TextBlock,
     ToolResultBlock,
-    ToolResultMessage,
     ToolUseBlock,
     UserMessage,
     create_user_message,
-    ProgressMessage,
-    SystemMessage,
 )
-from ..types.tool import Tool, ToolResult, ToolUseContext, ValidationResult
-from ..types.permission import PermissionMode, PermissionResult, PermissionDecision
+from ..types.tool import Tool, ToolUseContext
+from ..types.permission import PermissionDecision
 
 
 class SDKStatus(str, Enum):

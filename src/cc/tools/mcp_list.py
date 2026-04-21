@@ -4,8 +4,7 @@ Async tool for discovering MCP server resources.
 """
 
 from __future__ import annotations
-import asyncio
-from typing import ClassVar, Dict, Any, Optional, Callable, List
+from typing import Dict, Any, Optional, Callable, List
 
 from pydantic import BaseModel, Field
 
@@ -74,7 +73,7 @@ class ListMcpResourcesTool(Tool):
                                 description=r.get("description"),
                                 mime_type=r.get("mimeType"),
                             ))
-                    except Exception as e:
+                    except Exception:
                         # Skip failed clients
                         pass
 

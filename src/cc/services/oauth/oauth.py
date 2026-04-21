@@ -1,13 +1,12 @@
 """OAuth Service - OAuth authentication."""
 
 from __future__ import annotations
-import asyncio
 import json
 import time
 import secrets
 from pathlib import Path
-from typing import Any, Optional, Dict, List
-from dataclasses import dataclass, field
+from typing import Optional, Dict, List
+from dataclasses import dataclass
 from enum import Enum
 
 

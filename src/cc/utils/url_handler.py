@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import re
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode, quote, unquote

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 from rich.console import Console
 from rich.table import Table
 
-from ..utils.config import Config
 
 
 def run_profile(console: Console, action: str = "list", name: Optional[str] = None) -> None:

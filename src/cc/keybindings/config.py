@@ -5,12 +5,11 @@ Supports JSON and YAML configuration files for custom keybindings.
 
 from __future__ import annotations
 import json
-import asyncio
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 
-from . import KeyBinding, KeySequence, KeyMode, Platform, KeybindingsManager
+from . import KeyMode, Platform, KeybindingsManager
 
 
 @dataclass

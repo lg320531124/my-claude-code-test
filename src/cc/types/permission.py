@@ -10,10 +10,9 @@ Ported from TypeScript types/permissions.ts patterns:
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal, Optional, List, Dict, Any, Set
+from typing import Optional, List, Dict, Any, Set
 from dataclasses import dataclass, field
 
-from pydantic import BaseModel
 
 
 class PermissionDecision(str, Enum):

@@ -3,10 +3,9 @@
 from __future__ import annotations
 import zipfile
 import tarfile
-import shutil
 from pathlib import Path
 from typing import ClassVar, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

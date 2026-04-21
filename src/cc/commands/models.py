@@ -69,7 +69,7 @@ def show_current_model(console: Console) -> None:
     # Find model info
     for model_id, name, desc in AVAILABLE_MODELS:
         if model_id == current:
-            console.print(f"[bold]Current Model[/bold]")
+            console.print("[bold]Current Model[/bold]")
             console.print(f"  ID: {model_id}")
             console.print(f"  Name: {name}")
             console.print(f"  Description: {desc}")

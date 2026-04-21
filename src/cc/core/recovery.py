@@ -5,11 +5,10 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, Optional, List
+from typing import Any, Optional, List
 from dataclasses import dataclass, field, asdict
 
 from ..core.session import Session
-from ..core.engine import QueryStats
 
 
 @dataclass

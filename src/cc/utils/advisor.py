@@ -1,7 +1,6 @@
 """Advisor Service - Provide advice and recommendations."""
 
 from __future__ import annotations
-import asyncio
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum

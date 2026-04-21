@@ -1,13 +1,10 @@
 """GitHub App Command - GitHub App installation and management."""
 
 from __future__ import annotations
-import asyncio
-from pathlib import Path
-from typing import Optional, List
+from typing import List
 from rich.console import Console
 from rich.table import Table
 
-from ..utils.async_http import AsyncHTTPClient
 from ..utils.async_process import run_command_async
 
 
@@ -54,7 +51,7 @@ async def github_app_status(console: Console) -> None:
 
     # Check gh auth
     result = await run_command_async("gh auth status 2>&1")
-    console.print(f"\n[bold]GitHub CLI:[/]")
+    console.print("\n[bold]GitHub CLI:[/]")
     if "Logged in" in result.stdout:
         console.print("[green]✓ Authenticated[/]")
     else:

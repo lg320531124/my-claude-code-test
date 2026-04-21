@@ -1,10 +1,10 @@
 """Permission hooks - Tool call interception."""
 
 from __future__ import annotations
-from typing import Callable, Any
+from typing import Callable
 
-from ..types.permission import PermissionDecision, PermissionResult
-from ..types.tool import ToolInput, ToolUseContext
+from ..types.permission import PermissionResult
+from ..types.tool import ToolUseContext
 from .manager import PermissionManager
 from .prompts import PermissionPrompter
 

@@ -128,7 +128,7 @@ class TeamDeleteTool(ToolDef):
 
         service = get_memdir_service()
         # Would implement deletion logic
-        return ToolResult(content=f"Team deletion requires admin privileges")
+        return ToolResult(content="Team deletion requires admin privileges")
 
 
 __all__ = [

@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
-from pathlib import Path
 
 from ..types.tool import ToolDef, ToolResult, ToolUseContext
 

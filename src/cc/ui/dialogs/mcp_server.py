@@ -1,14 +1,11 @@
 """MCP Server Dialog - MCP server management dialogs."""
 
 from __future__ import annotations
-from textual.widget import Widget
 from textual.widgets import Static, Button, Input, DataTable
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen, Screen
-from textual.containers import Container, VerticalScroll
 from textual.binding import Binding
-from rich.text import Text
 
 
 class MCPServerDialog(ModalScreen):

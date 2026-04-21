@@ -3,11 +3,11 @@
 from __future__ import annotations
 import asyncio
 from pathlib import Path
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from enum import Enum
 
-from ..utils.git import GitManager, GitBranch
+from ..utils.git import GitManager
 
 
 class BranchAction(Enum):

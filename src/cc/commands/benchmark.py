@@ -8,7 +8,6 @@ from typing import Optional
 from rich.console import Console
 from rich.table import Table
 
-from ..tools.timer import TimerTool
 
 
 def run_benchmark(console: Console, target: Optional[str] = None, iterations: int = 10) -> None:

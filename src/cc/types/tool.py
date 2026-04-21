@@ -12,14 +12,13 @@ Ported from TypeScript Tool.ts patterns:
 from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Optional, Dict, List, Callable, Union, Awaitable, AsyncIterator
+from typing import Any, Optional, Dict, List, Callable, Union
 from dataclasses import dataclass, field
-from concurrent.futures import ThreadPoolExecutor
 
 from pydantic import BaseModel
 
-from .message import ToolResultBlock, ProgressMessage
-from .permission import PermissionResult, PermissionDecision, ToolPermissionContext
+from .message import ToolResultBlock
+from .permission import PermissionResult, PermissionDecision
 
 
 class ToolInput(BaseModel):

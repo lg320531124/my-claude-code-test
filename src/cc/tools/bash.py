@@ -16,18 +16,14 @@ Ported from TypeScript BashTool.tsx patterns:
 
 from __future__ import annotations
 import asyncio
-import os
 import re
-import shutil
-import subprocess
 import time
 from pathlib import Path
-from typing import ClassVar, Dict, Any, Optional, Set, Callable, List, Union
-from dataclasses import dataclass
+from typing import Dict, Any, Optional, Set, Callable, List
 
 from pydantic import BaseModel, Field
 
-from ..types.tool import Tool, ToolDef, ToolInput, ToolResult, ToolUseContext, ValidationResult, ToolProgressData
+from ..types.tool import Tool, ToolInput, ToolResult, ToolUseContext, ValidationResult, ToolProgressData
 from ..types.permission import PermissionResult, PermissionDecision
 
 

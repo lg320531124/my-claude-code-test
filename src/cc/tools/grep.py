@@ -15,9 +15,8 @@ Ported from TypeScript GrepTool.ts patterns:
 from __future__ import annotations
 import os
 import subprocess
-import time
 from pathlib import Path
-from typing import ClassVar, Dict, Any, Optional, List, Callable, Set
+from typing import Dict, Any, Optional, List, Callable, Set
 
 from pydantic import BaseModel, Field
 

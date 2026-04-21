@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-from pathlib import Path
 from typing import Optional, List
 from rich.console import Console
 from rich.table import Table
-from rich.tree import Tree
 
 from ..services.hooks import HookManager, HookType, get_hook_manager
 

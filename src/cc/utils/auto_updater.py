@@ -1,9 +1,6 @@
 """Auto Updater - Check and apply updates."""
 
 from __future__ import annotations
-import asyncio
-import json
-from pathlib import Path
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
@@ -63,7 +60,7 @@ class AutoUpdater:
             self._last_check = datetime.now()
             return self._update_info
 
-        except Exception as e:
+        except Exception:
             return None
 
     async def apply_update(self, version: str = None) -> bool:

@@ -1,12 +1,10 @@
 """File State Cache - Cache file state for quick access."""
 
 from __future__ import annotations
-import asyncio
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
-from functools import lru_cache
 
 
 @dataclass

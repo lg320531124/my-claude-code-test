@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import re
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Set
 from dataclasses import dataclass, field
 from enum import Enum
 

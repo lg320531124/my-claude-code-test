@@ -1,9 +1,8 @@
 """Code Block Widget - Code display and highlighting."""
 
 from __future__ import annotations
-import asyncio
 import re
-from typing import Any, Dict, Optional, List, Callable
+from typing import Dict, Optional, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 

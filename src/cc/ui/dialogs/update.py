@@ -8,7 +8,6 @@ from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.binding import Binding
-from textual.containers import Container
 from rich.text import Text
 
 

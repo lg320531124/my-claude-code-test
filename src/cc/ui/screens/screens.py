@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 import asyncio
-import time
 from pathlib import Path
-from typing import ClassVar
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll
+from textual.containers import Container, Horizontal, VerticalScroll
 from textual.widgets import (
     Header,
     Footer,
@@ -20,19 +18,14 @@ from textual.widgets import (
     ListItem,
     Tree,
     DataTable,
-    TabbedContent,
 )
 from textual.screen import Screen, ModalScreen
 from textual.reactive import reactive
 from textual.message import Message
-from textual.events import Key
-from textual.css.query import NoMatches
-from rich.text import Text
-from rich.markdown import Markdown
 
 from ...core.session import Session, SessionManager
-from ...services.plugins.plugin_system import PluginManager, PluginState
-from ...services.hooks.hooks_system import HookManager, HookType
+from ...services.plugins.plugin_system import PluginManager
+from ...services.hooks.hooks_system import HookManager
 
 
 class HelpScreen(ModalScreen):

@@ -1,7 +1,7 @@
 """Model Selection Utilities - Model selection and configuration."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from dataclasses import dataclass
 from enum import Enum
 

@@ -4,7 +4,6 @@ from __future__ import annotations
 import asyncio
 import time
 from pathlib import Path
-from typing import ClassVar
 
 from rich.console import Console
 from rich.table import Table
@@ -14,7 +13,7 @@ from rich.panel import Panel
 
 async def list_sessions_async(console: Console) -> None:
     """List all saved sessions."""
-    from ..core.recovery import list_saved_sessions, SessionHistory
+    from ..core.recovery import list_saved_sessions
 
     sessions = list_saved_sessions()
 
@@ -47,7 +46,7 @@ async def list_sessions_async(console: Console) -> None:
 
 async def load_session_async(console: Console, session_id: str) -> None:
     """Load a saved session."""
-    from ..core.recovery import load_session, SessionRecovery
+    from ..core.recovery import load_session
 
     data = load_session(session_id)
 
@@ -109,7 +108,7 @@ async def export_session_async(console: Console, session_id: str, output_path: P
     if result:
         console.print(f"[green]Exported to: {output_path}[/green]")
     else:
-        console.print(f"[red]Failed to export[/red]")
+        console.print("[red]Failed to export[/red]")
 
     return result
 

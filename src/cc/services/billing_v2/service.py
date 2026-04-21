@@ -1,7 +1,6 @@
 """Billing Service - Track and manage billing."""
 
 from __future__ import annotations
-import asyncio
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum

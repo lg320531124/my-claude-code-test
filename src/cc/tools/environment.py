@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 import os
-from typing import ClassVar, Dict, List, Optional
-from pydantic import BaseModel, Field
+from typing import ClassVar, Optional
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

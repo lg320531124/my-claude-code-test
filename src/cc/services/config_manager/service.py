@@ -95,7 +95,6 @@ class ConfigManager:
 
     def _load_defaults(self) -> None:
         """Load default configuration."""
-        import time
 
         for key, value in self.DEFAULTS.items():
             entry = ConfigEntry(

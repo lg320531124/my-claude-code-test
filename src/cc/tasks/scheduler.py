@@ -10,12 +10,12 @@ Provides async task scheduling and execution:
 
 from __future__ import annotations
 import asyncio
-from typing import Callable, Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from . import Task, TaskStatus, TaskManager, get_task_manager
+from . import TaskStatus, TaskManager, get_task_manager
 
 
 class ScheduleType(Enum):

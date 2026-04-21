@@ -1,7 +1,6 @@
 """OAuth Anthropic - Async Anthropic OAuth flow."""
 
 from __future__ import annotations
-import asyncio
 import secrets
 import time
 from typing import Dict, Any, Optional

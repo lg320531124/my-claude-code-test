@@ -4,12 +4,10 @@ Async voice services for STT (Speech-to-Text) and TTS.
 """
 
 from __future__ import annotations
-import asyncio
-from typing import Dict, Any, Optional, AsyncIterator
+from typing import Optional, AsyncIterator
 from dataclasses import dataclass
 
 from ...utils.async_http import AsyncHTTPClient
-from ...utils.async_process import run_command_async
 
 
 @dataclass

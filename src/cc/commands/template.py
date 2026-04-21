@@ -1,12 +1,11 @@
 """Template Command - Template management."""
 
 from __future__ import annotations
-from pathlib import Path
 from typing import Optional
 from rich.console import Console
 from rich.table import Table
 
-from ..services.template.template import get_template_service, TEMPLATE_LIBRARY
+from ..services.template.template import get_template_service
 
 
 def run_template(console: Console, action: str = "list", name: Optional[str] = None, category: Optional[str] = None) -> None:

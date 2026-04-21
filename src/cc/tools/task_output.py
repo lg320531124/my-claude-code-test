@@ -1,9 +1,8 @@
 """Task Output Tool - Get output from running/completed tasks."""
 
 from __future__ import annotations
-import asyncio
-from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, field
+from typing import Optional, Dict, Any
+from dataclasses import dataclass
 from enum import Enum
 
 from ..types.tool import ToolDef, ToolResult, ToolInput, ToolUseContext

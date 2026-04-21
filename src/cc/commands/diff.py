@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from dataclasses import dataclass, field
 from enum import Enum
 

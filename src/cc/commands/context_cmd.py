@@ -1,15 +1,12 @@
 """Context Command - Context visualization."""
 
 from __future__ import annotations
-import asyncio
-from pathlib import Path
-from typing import Optional
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
 
 from ..core.session import Session
-from ..services.token_estimation import estimate_tokens, estimate_messages_tokens
+from ..services.token_estimation import estimate_messages_tokens
 
 
 async def run_context(console: Console, session: Session, action: str, args: list) -> None:

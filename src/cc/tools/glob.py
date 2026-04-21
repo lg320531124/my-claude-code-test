@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 import time
 from pathlib import Path
-from typing import ClassVar, Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List, Callable
 
 from pydantic import BaseModel, Field
 

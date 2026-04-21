@@ -7,7 +7,6 @@ from rich.table import Table
 
 def run_cost(console: Console) -> None:
     """Show usage cost."""
-    from ..core.session import Session
 
     # This would normally track actual API usage
     # Placeholder for demonstration

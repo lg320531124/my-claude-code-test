@@ -3,7 +3,7 @@
 from __future__ import annotations
 import re
 import shlex
-from typing import Dict, Any, Optional, List, Tuple, Union
+from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path

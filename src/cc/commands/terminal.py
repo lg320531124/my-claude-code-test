@@ -19,7 +19,6 @@ def terminal_group():
 def terminal_info():
     """Show terminal information."""
     import os
-    import shutil
 
     term_type = os.environ.get("TERM", "unknown")
     shell = os.environ.get("SHELL", "unknown")

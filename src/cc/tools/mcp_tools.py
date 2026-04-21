@@ -1,8 +1,7 @@
 """MCP Tools - MCP resource and authentication tools."""
 
 from __future__ import annotations
-import asyncio
-from typing import ClassVar, List, Dict, Any
+from typing import ClassVar
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

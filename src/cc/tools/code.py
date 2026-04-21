@@ -4,7 +4,7 @@ from __future__ import annotations
 import ast
 import re
 from pathlib import Path
-from typing import ClassVar, Dict, List, Optional, Any
+from typing import ClassVar, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
@@ -125,7 +125,7 @@ class CodeTool(ToolDef):
         analysis.complexity = len([n for n in ast.walk(tree)
                                   if isinstance(n, (ast.If, ast.While, ast.For, ast.ExceptHandler))])
 
-        result = f"Analysis:\n"
+        result = "Analysis:\n"
         result += f"  Lines: {analysis.lines}\n"
         result += f"  Classes: {len(analysis.classes)}\n"
         result += f"  Functions: {len(analysis.functions)}\n"
@@ -133,9 +133,9 @@ class CodeTool(ToolDef):
         result += f"  Complexity: {analysis.complexity}\n"
 
         if analysis.classes:
-            result += f"\nClasses:\n  - " + "\n  - ".join(analysis.classes) + "\n"
+            result += "\nClasses:\n  - " + "\n  - ".join(analysis.classes) + "\n"
         if analysis.functions:
-            result += f"\nFunctions:\n  - " + "\n  - ".join(analysis.functions) + "\n"
+            result += "\nFunctions:\n  - " + "\n  - ".join(analysis.functions) + "\n"
 
         return ToolResult(content=result, metadata=analysis.model_dump())
 
@@ -166,7 +166,7 @@ class CodeTool(ToolDef):
                 # Add method signatures
                 for child in ast.iter_child_nodes(node):
                     if isinstance(child, ast.Return):
-                        outline.append(f"    returns: ...")
+                        outline.append("    returns: ...")
 
             elif isinstance(node, ast.ClassDef):
                 outline.append(f"class {node.name}:")
@@ -275,7 +275,7 @@ class CodeTool(ToolDef):
             "words": len(code.split()),
         }
 
-        result = f"Code Statistics:\n"
+        result = "Code Statistics:\n"
         result += f"  Total lines: {stats['total_lines']}\n"
         result += f"  Code lines: {stats['code_lines']}\n"
         result += f"  Comment lines: {stats['comment_lines']}\n"

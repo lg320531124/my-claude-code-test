@@ -6,7 +6,7 @@ Async token estimation for API usage management.
 from __future__ import annotations
 import asyncio
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from dataclasses import dataclass
 
 

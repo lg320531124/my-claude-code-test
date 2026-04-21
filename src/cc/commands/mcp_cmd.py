@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-from pathlib import Path
-from typing import ClassVar
 
 from rich.console import Console
-from rich.table import Table
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
 from rich.panel import Panel
 
 

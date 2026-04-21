@@ -3,13 +3,12 @@
 from __future__ import annotations
 import asyncio
 import json
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from rich.console import Console
 from rich.table import Table
 
-from .client import MCPManager, get_mcp_manager
+from .client import get_mcp_manager
 
 
 console = Console()

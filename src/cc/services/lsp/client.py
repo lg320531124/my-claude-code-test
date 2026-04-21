@@ -6,7 +6,7 @@ Async client for connecting to LSP servers.
 from __future__ import annotations
 import asyncio
 import json
-from typing import Dict, Any, Optional, List, AsyncIterator
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from pathlib import Path
 

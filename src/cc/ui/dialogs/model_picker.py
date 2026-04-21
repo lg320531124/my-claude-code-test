@@ -3,7 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from textual.widget import Widget
-from textual.widgets import Static, Button, DataTable
+from textual.widgets import Static, DataTable
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen

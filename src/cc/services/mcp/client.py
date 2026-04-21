@@ -6,12 +6,12 @@ Async client for connecting to MCP servers and discovering tools/resources.
 from __future__ import annotations
 import asyncio
 import json
-from typing import Dict, Any, Optional, List, AsyncIterator, Callable
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from ...utils.async_process import AsyncProcess, ProcessResult
-from ...utils.async_io import read_file_async, write_file_async
+from ...utils.async_process import AsyncProcess
+from ...utils.async_io import read_file_async
 
 
 @dataclass
@@ -260,7 +260,7 @@ class MCPManager:
         for config in configs:
             try:
                 await self.connect_server(config)
-            except Exception as e:
+            except Exception:
                 # Skip failed connections
                 pass
 

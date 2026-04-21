@@ -1,7 +1,7 @@
 """Styling Service - UI styling and themes."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 

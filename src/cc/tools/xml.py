@@ -3,8 +3,8 @@
 from __future__ import annotations
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import ClassVar, Optional, List
-from pydantic import BaseModel, Field
+from typing import ClassVar, Optional
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

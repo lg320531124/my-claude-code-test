@@ -1,8 +1,6 @@
 """File History - Track file change history."""
 
 from __future__ import annotations
-import asyncio
-import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime

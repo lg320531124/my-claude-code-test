@@ -1,8 +1,8 @@
 """Message Row Widget - Single message row."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Optional
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 

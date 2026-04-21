@@ -5,7 +5,7 @@ import asyncio
 import wave
 import io
 import struct
-from typing import AsyncIterator, Optional, Callable, List, Dict
+from typing import AsyncIterator, Optional, List, Dict
 from dataclasses import dataclass, field
 from enum import Enum
 

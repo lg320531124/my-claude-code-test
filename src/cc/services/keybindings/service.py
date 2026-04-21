@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 from ...utils.log import get_logger

@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 from textual.widget import Widget
-from textual.widgets import Static
 from textual.reactive import reactive
 from rich.text import Text
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 
 class SpinnerProgress(Widget):

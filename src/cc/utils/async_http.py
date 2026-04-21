@@ -4,11 +4,9 @@
 """
 
 from __future__ import annotations
-import asyncio
 import json
 import time
-from typing import Optional, Union, AsyncIterator, Callable, Any, Dict
-from urllib.parse import urlparse
+from typing import Optional, Union, AsyncIterator, Callable, Any
 
 try:
     import httpx

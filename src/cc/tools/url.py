@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
-from typing import ClassVar, Dict, Optional, List, Any
+from typing import ClassVar, Dict, Optional, Any
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext

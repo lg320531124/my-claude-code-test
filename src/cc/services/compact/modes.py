@@ -1,11 +1,9 @@
 """Compact Services - Context compression modes."""
 
 from __future__ import annotations
-import asyncio
-import json
 import re
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 

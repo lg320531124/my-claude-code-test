@@ -1,9 +1,8 @@
 """Search Hook - Async search operations."""
 
 from __future__ import annotations
-import asyncio
 import re
-from typing import Any, Dict, List, Optional, Callable, AsyncIterator, Pattern
+from typing import Any, Dict, List, Optional, Pattern
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path

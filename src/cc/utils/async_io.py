@@ -7,7 +7,7 @@ from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
-from typing import Optional, Union, AsyncIterator, Any
+from typing import Optional, Union, AsyncIterator
 
 try:
     import aiofiles

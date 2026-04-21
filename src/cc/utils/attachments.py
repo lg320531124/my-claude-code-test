@@ -1,11 +1,10 @@
 """Attachments Utils - Handle file attachments."""
 
 from __future__ import annotations
-import asyncio
 import base64
 import mimetypes
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 
 
 async def read_attachment(path: Path) -> Dict[str, Any]:

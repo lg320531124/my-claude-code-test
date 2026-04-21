@@ -1,16 +1,14 @@
 """Search Screen - Codebase search interface."""
 
 from __future__ import annotations
-import asyncio
 from textual.widget import Widget
-from textual.widgets import Static, Button, Input, ListView, ListItem, DataTable
+from textual.widgets import Static, Button, Input, DataTable
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import Screen
 from textual.binding import Binding
-from textual.containers import Container, VerticalScroll, Horizontal
+from textual.containers import Container, Horizontal
 from rich.text import Text
-from rich.syntax import Syntax
 
 
 class SearchScreen(Screen):

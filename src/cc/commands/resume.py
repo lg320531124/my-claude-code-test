@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 import asyncio
-from pathlib import Path
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
-from datetime import datetime
 
-from ..core.session import SessionManager, Session
+from ..core.session import SessionManager
 
 
 @dataclass

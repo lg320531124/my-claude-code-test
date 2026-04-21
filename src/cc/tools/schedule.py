@@ -3,9 +3,8 @@
 from __future__ import annotations
 import asyncio
 import time
-from pathlib import Path
-from typing import ClassVar, Callable, Any, Optional
-from dataclasses import dataclass, field
+from typing import ClassVar, Callable, Optional
+from dataclasses import dataclass
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

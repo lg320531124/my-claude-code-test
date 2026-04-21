@@ -7,9 +7,8 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-import signal
 from pathlib import Path
-from typing import Optional, Union, AsyncIterator, Callable, Any
+from typing import Optional, Union, AsyncIterator, Callable
 
 
 class ProcessResult:

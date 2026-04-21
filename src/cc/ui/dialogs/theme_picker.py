@@ -3,14 +3,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from textual.widget import Widget
-from textual.widgets import Static, Button, ListView, ListItem
+from textual.widgets import Static, ListView, ListItem
 from textual.reactive import reactive
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.binding import Binding
-from textual.app import App
 from rich.text import Text
-from rich.panel import Panel
 
 
 @dataclass

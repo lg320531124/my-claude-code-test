@@ -90,7 +90,7 @@ class BridgeAPI:
             self._status = BridgeStatus.CONNECTED
             return True
 
-        except Exception as e:
+        except Exception:
             self._status = BridgeStatus.ERROR
             return False
 

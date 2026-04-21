@@ -12,7 +12,7 @@ from datetime import datetime
 
 import aiofiles
 
-from . import AppState, Store, Action, ActionType, SessionState, get_store
+from . import AppState, Action, ActionType, get_store
 
 
 class StatePersistence:
@@ -110,7 +110,7 @@ class StatePersistence:
                     "message_count": len(state_dict.get("session", {}).get("messages", [])),
                     "filepath": str(filepath),
                 }
-            except Exception as e:
+            except Exception:
                 pass
 
         return sessions

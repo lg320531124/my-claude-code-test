@@ -43,7 +43,7 @@ async def sandbox_status(console: Console, cwd: Path) -> None:
         import json
         config = json.loads(content)
 
-        console.print(f"\n[bold]Configuration:[/]")
+        console.print("\n[bold]Configuration:[/]")
         console.print(f"  Mode: {config.get('mode', 'restricted')}")
         console.print(f"  Allowed paths: {len(config.get('allowed_paths', []))}")
         console.print(f"  Allowed commands: {len(config.get('allowed_commands', []))}")
@@ -77,7 +77,7 @@ async def enable_sandbox(console: Console, cwd: Path) -> None:
 
     await write_file_async(sandbox_path, json.dumps(sandbox_config, indent=2))
 
-    console.print(f"[green]✓ Sandbox enabled[/]")
+    console.print("[green]✓ Sandbox enabled[/]")
     console.print(f"  Config: {sandbox_path}")
 
 
@@ -115,9 +115,9 @@ async def test_sandbox(console: Console, cwd: Path, command: Optional[str]) -> N
         try:
             result = await run_command_async(cmd, cwd=cwd, timeout=5)
             if result.exit_code == 0:
-                console.print(f"[green]✓ Allowed[/]")
+                console.print("[green]✓ Allowed[/]")
             else:
-                console.print(f"[red]✗ Blocked[/]")
+                console.print("[red]✗ Blocked[/]")
                 console.print(f"[dim]Reason: {result.stderr[:50]}[/]")
         except asyncio.TimeoutError:
             console.print("[red]✗ Timeout (blocked)[/]")

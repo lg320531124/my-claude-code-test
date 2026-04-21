@@ -1,9 +1,8 @@
 """Tool Summary Service - Summarize tool usage."""
 
 from __future__ import annotations
-import asyncio
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 

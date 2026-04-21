@@ -1,8 +1,7 @@
 """Thinking Utilities - Extended thinking support."""
 
 from __future__ import annotations
-import asyncio
-from typing import Dict, Any, Optional, List
+from typing import Dict, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 

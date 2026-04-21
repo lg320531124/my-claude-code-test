@@ -1,10 +1,9 @@
 """Claude.md Parser - Parse CLAUDE.md files for context."""
 
 from __future__ import annotations
-import asyncio
 import re
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from dataclasses import dataclass, field
 
 from .async_io import read_file_async, exists_async

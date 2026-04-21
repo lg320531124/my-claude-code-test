@@ -3,13 +3,10 @@
 from __future__ import annotations
 import asyncio
 import os
-import sys
 from pathlib import Path
 
 import click
 from rich.console import Console
-from rich.live import Live
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.text import Text
@@ -118,7 +115,6 @@ async def _run_repl(
     initial_prompt: Optional[str],
 ) -> None:
     """Async REPL loop with streaming."""
-    from .types.message import create_user_message
 
     # Handle initial prompt if provided
     if initial_prompt:

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 import asyncio
-from typing import Any, Dict, Optional, List, Callable
-from dataclasses import dataclass, field
+from typing import Any, Dict, Optional, Callable
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 

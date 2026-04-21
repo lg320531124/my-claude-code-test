@@ -4,8 +4,8 @@ from __future__ import annotations
 import socket
 import asyncio
 import httpx
-from typing import ClassVar, Optional, List
-from pydantic import BaseModel, Field
+from typing import ClassVar, Optional
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -102,7 +102,7 @@ class NetworkTool(ToolDef):
 
             result = f"Host: {host}\n"
             result += f"Canonical: {cname}\n"
-            result += f"Addresses:\n"
+            result += "Addresses:\n"
             for addr in unique_addresses:
                 result += f"  {addr}\n"
 
@@ -188,7 +188,7 @@ class NetworkTool(ToolDef):
         # Try to get all interfaces (limited info without extra libs)
         info["interfaces"] = []
 
-        result = f"Network Info:\n"
+        result = "Network Info:\n"
         result += f"  Hostname: {info['hostname']}\n"
         result += f"  FQDN: {info['fqdn']}\n"
         result += f"  Local IP: {info['local_ip']}\n"

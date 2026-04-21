@@ -1,7 +1,7 @@
 """Vim Operators - Vim operator commands."""
 
 from __future__ import annotations
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Callable
 from dataclasses import dataclass
 
 

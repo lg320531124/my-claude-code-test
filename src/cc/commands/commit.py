@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-import subprocess
 import re
 from pathlib import Path
-from typing import Optional, ClassVar
+from typing import Optional
 from dataclasses import dataclass
 
 from rich.console import Console
@@ -285,7 +284,7 @@ async def amend_commit(console: Console, cwd: Path, message: str) -> bool:
     )
 
     if code == 0:
-        console.print(f"[green]✓ Amended commit[/green]")
+        console.print("[green]✓ Amended commit[/green]")
         return True
     else:
         console.print(f"[red]Amend failed: {stderr}[/red]")

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, Optional
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 
@@ -47,9 +47,9 @@ class PDFTool(ToolDef):
 
             result_content = f"PDF: {path}\n"
             result_content += f"Size: {self._format_size(size)}\n"
-            result_content += f"\nNote: PDF content extraction requires pdfplumber or PyPDF2 library.\n"
-            result_content += f"Install with: pip install pdfplumber\n"
-            result_content += f"\nTo extract content, use:\n"
+            result_content += "\nNote: PDF content extraction requires pdfplumber or PyPDF2 library.\n"
+            result_content += "Install with: pip install pdfplumber\n"
+            result_content += "\nTo extract content, use:\n"
             result_content += f"  pages: {input.pages or 'all'} (max {input.max_pages})\n"
 
             return ToolResult(

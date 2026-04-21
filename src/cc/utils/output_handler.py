@@ -3,7 +3,7 @@
 from __future__ import annotations
 import re
 import json
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path

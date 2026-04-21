@@ -1,7 +1,6 @@
 """Workspace Manager - Manage workspace/projects."""
 
 from __future__ import annotations
-import asyncio
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
@@ -59,7 +58,6 @@ class WorkspaceManager:
     ) -> WorkspaceInfo:
         """Create workspace."""
         import uuid
-        import time
 
         # Generate ID
         workspace_id = str(uuid.uuid4())[:8]

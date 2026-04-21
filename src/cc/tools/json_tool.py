@@ -3,8 +3,8 @@
 from __future__ import annotations
 import json
 from pathlib import Path
-from typing import ClassVar, Dict, Optional, Any
-from pydantic import BaseModel, Field
+from typing import ClassVar, Optional
+from pydantic import Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext
 

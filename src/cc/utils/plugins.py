@@ -1,7 +1,6 @@
 """Plugins - Plugin loading and management."""
 
 from __future__ import annotations
-import asyncio
 import importlib
 import json
 from typing import Dict, Any, Optional, List, Callable

@@ -3,7 +3,7 @@
 from __future__ import annotations
 import re
 from pathlib import Path
-from typing import ClassVar, Dict, Optional, List, Any
+from typing import ClassVar, Optional, List
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext

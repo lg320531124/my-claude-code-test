@@ -5,7 +5,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Optional
+from typing import Any, Callable, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 

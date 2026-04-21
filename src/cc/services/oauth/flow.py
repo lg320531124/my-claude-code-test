@@ -1,14 +1,13 @@
 """OAuth Flow - General OAuth flow utilities."""
 
 from __future__ import annotations
-import asyncio
 import secrets
 import time
 import base64
 import hashlib
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
-from urllib.parse import urlencode, parse_qs, urlparse
+from urllib.parse import urlencode
 
 
 @dataclass

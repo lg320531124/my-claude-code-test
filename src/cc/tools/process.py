@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 import signal
-from typing import ClassVar, Optional, List, Dict, Any
+from typing import ClassVar, Optional, Dict
 from pydantic import BaseModel, Field
 
 from ..types.tool import ToolDef, ToolInput, ToolResult, ToolUseContext

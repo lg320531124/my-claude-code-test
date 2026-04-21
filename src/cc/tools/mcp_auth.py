@@ -4,8 +4,7 @@ Async tool for authenticating with MCP servers via OAuth.
 """
 
 from __future__ import annotations
-import asyncio
-from typing import ClassVar, Dict, Any, Optional, Callable
+from typing import Dict, Any, Optional, Callable
 
 from pydantic import BaseModel, Field
 

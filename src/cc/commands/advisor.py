@@ -4,6 +4,7 @@ from __future__ import annotations
 import click
 from rich.console import Console
 from rich.panel import Panel
+from typing import List, Dict
 
 console = Console()
 
@@ -47,7 +48,6 @@ def advisor_command(path: str, type: str, depth: str):
 
 def _analyze_code(path, type: str, depth: str) -> dict:
     """Analyze code for issues."""
-    from pathlib import Path
 
     issues = {}
 

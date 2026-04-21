@@ -4,10 +4,9 @@ from __future__ import annotations
 import asyncio
 import os
 import re
-from typing import Any, Dict, Optional, List, Set
+from typing import Optional, List, Set
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 
 
 class SandboxMode(Enum):

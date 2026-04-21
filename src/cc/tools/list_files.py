@@ -1,7 +1,6 @@
 """List Files Tool - Directory listing."""
 
 from __future__ import annotations
-import os
 from pathlib import Path
 from typing import ClassVar, List, Optional
 from pydantic import BaseModel, Field

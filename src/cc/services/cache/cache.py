@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 class CacheEntry(BaseModel):
