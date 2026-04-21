@@ -481,6 +481,7 @@ _keybindings_manager: Optional[KeybindingsManager] = None
 
 def get_keybindings_manager() -> KeybindingsManager:
     """Get global keybindings manager."""
+    global _keybindings_manager
     if _keybindings_manager is None:
         _keybindings_manager = create_default_keybindings()
     return _keybindings_manager

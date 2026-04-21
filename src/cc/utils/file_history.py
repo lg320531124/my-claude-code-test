@@ -91,6 +91,7 @@ _history: Optional[FileHistory] = None
 
 def get_file_history() -> FileHistory:
     """Get global file history."""
+    global _history
     if _history is None:
         _history = FileHistory()
     return _history

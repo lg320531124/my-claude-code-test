@@ -378,6 +378,7 @@ _service: Optional[MemDirService] = None
 
 def get_memdir_service() -> MemDirService:
     """Get global service."""
+    global _service
     if _service is None:
         _service = MemDirService()
     return _service

@@ -210,6 +210,7 @@ _persistence: Optional[StatePersistence] = None
 
 def get_persistence() -> StatePersistence:
     """Get global persistence manager."""
+    global _persistence
     if _persistence is None:
         _persistence = StatePersistence()
     return _persistence

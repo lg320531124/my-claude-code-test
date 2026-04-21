@@ -154,6 +154,7 @@ _extraction: Optional[MemoryExtractionService] = None
 
 def get_memory_extraction() -> MemoryExtractionService:
     """Get extraction service."""
+    global _extraction
     if _extraction is None:
         _extraction = MemoryExtractionService()
     return _extraction

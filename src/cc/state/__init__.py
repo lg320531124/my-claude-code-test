@@ -637,6 +637,7 @@ _store: Optional[Store] = None
 
 def get_store() -> Store:
     """Get global store."""
+    global _store
     if _store is None:
         _store = Store()
     return _store

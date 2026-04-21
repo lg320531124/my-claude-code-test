@@ -11,7 +11,6 @@ from .client import (
 )
 from .streaming import (
     StreamEventType,
-    StreamEvent,
     SSEParser,
     MessageAccumulator,
     StreamingResponseHandler,

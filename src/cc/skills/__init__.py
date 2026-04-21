@@ -246,6 +246,7 @@ _registry: Optional[SkillRegistry] = None
 
 def get_skill_registry() -> SkillRegistry:
     """Get global registry."""
+    global _registry
     if _registry is None:
         _registry = SkillRegistry()
         # Register built-in skills

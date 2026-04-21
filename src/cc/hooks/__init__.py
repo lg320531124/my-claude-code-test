@@ -545,53 +545,6 @@ async def use_session_storage() -> Dict[str, Any]:
     }
 
 
-async def use_clipboard() -> Dict[str, Any]:
-    """Clipboard hook.
-
-    Returns clipboard functions.
-    """
-    async def copy(text: str) -> None:
-        # Would copy to clipboard
-        await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: __import__("subprocess").run(["pbcopy"], input=text.encode())
-        )
-
-    async def paste() -> str:
-        # Would paste from clipboard
-        result = await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: __import__("subprocess").run(["pbpaste"], capture_output=True, text=True)
-        )
-        return result.stdout
-
-    return {
-        "copy": copy,
-        "paste": paste,
-    }
-
-
-async def use_notifications() -> Dict[str, Any]:
-    """Notifications hook.
-
-    Returns notification functions.
-    """
-    async def notify(message: str, level: str = "info") -> None:
-        from ..services.notifier import get_notifier
-
-        notifier = get_notifier()
-        await notifier.notify(message, level)
-
-    async def subscribe(handler: Callable) -> None:
-        # Would subscribe to notifications
-        pass
-
-    return {
-        "notify": notify,
-        "subscribe": subscribe,
-    }
-
-
 __all__ = [
     # Base hooks
     "HookState",

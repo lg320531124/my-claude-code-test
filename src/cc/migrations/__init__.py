@@ -318,6 +318,7 @@ _manager: Optional[MigrationManager] = None
 
 def get_migration_manager() -> MigrationManager:
     """Get global migration manager."""
+    global _manager
     if _manager is None:
         _manager = MigrationManager()
     return _manager

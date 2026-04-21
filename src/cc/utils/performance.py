@@ -278,6 +278,7 @@ class ParallelExecutor:
         completed = 0
 
         async def run_task(task: Callable, idx: int):
+            nonlocal completed
             async with self._get_semaphore():
                 result = await task()
                 results[idx] = result

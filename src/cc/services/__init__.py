@@ -167,7 +167,6 @@ from .telemetry.telemetry import (
     TelemetryEvent,
     TelemetryService,
     get_telemetry_service,
-    track_event,
 )
 
 # Security

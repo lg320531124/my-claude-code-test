@@ -251,11 +251,12 @@ class BuddyVisualizer:
 
 
 # Global visualizer
-_visualizer: Optional[BuddyVisualizer] = None
+_visualizer: "Optional[BuddyVisualizer]" = None
 
 
 def get_visualizer() -> BuddyVisualizer:
     """Get global visualizer."""
+    global _visualizer
     if _visualizer is None:
         _visualizer = BuddyVisualizer()
     return _visualizer

@@ -128,6 +128,7 @@ _registry: Optional[HookRegistry] = None
 
 def get_hook_registry() -> HookRegistry:
     """Get global registry."""
+    global _registry
     if _registry is None:
         _registry = HookRegistry()
     return _registry

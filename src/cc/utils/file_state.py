@@ -105,6 +105,7 @@ _cache: Optional[FileStateCache] = None
 
 def get_file_cache() -> FileStateCache:
     """Get global cache."""
+    global _cache
     if _cache is None:
         _cache = FileStateCache()
     return _cache

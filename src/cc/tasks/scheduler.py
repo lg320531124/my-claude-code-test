@@ -318,6 +318,7 @@ _scheduler: Optional[TaskScheduler] = None
 
 def get_scheduler() -> TaskScheduler:
     """Get global scheduler."""
+    global _scheduler
     if _scheduler is None:
         _scheduler = TaskScheduler()
     return _scheduler

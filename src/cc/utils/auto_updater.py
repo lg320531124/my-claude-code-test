@@ -88,6 +88,7 @@ _updater: Optional[AutoUpdater] = None
 
 def get_updater() -> AutoUpdater:
     """Get global updater."""
+    global _updater
     if _updater is None:
         _updater = AutoUpdater()
     return _updater

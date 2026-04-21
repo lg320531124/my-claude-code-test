@@ -562,6 +562,7 @@ _task_manager: Optional[TaskManager] = None
 
 def get_task_manager() -> TaskManager:
     """Get global task manager."""
+    global _task_manager
     if _task_manager is None:
         persistence_path = Path.home() / ".claude" / "tasks.json"
         _task_manager = TaskManager(persistence_path)
