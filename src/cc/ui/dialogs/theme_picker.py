@@ -1,6 +1,7 @@
 """Theme Picker - Theme selection dialog."""
 
 from __future__ import annotations
+from typing import List, Dict, Optional, Any, Callable
 from dataclasses import dataclass
 from textual.widget import Widget
 from textual.widgets import Static, ListView, ListItem

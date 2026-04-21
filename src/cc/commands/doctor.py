@@ -5,7 +5,7 @@ import asyncio
 import os
 import platform
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 
 from rich.console import Console
