@@ -147,14 +147,14 @@ def _matches_subpattern(subpattern: str, input_dict: dict) -> bool:
 
     # For Bash tool
     if "command" in input_dict:
-        cmd = input_Dict["command"]
+        cmd = input_dict["command"]
         if subpattern.endswith("*"):
             return cmd.startswith(subpattern[:-1])
         return cmd == subpattern
 
     # For file tools
     if "file_path" in input_dict:
-        path = input_Dict["file_path"]
+        path = input_dict["file_path"]
         if subpattern.endswith("*"):
             return path.startswith(subpattern[:-1])
         return path == subpattern or path.endswith(subpattern)

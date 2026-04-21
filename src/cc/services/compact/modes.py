@@ -123,7 +123,7 @@ class MicroCompactor:
 
         return CompactResult(
             original_tokens=original_tokens,
-            compacted_tokens=compacteded_tokens,
+            compacted_tokens=compacted_tokens,
             compression_ratio=compacted_tokens / original_tokens if original_tokens > 0 else 0,
             messages_removed=0,
             messages_preserved=len(messages),
