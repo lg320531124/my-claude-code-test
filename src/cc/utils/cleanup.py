@@ -23,8 +23,8 @@ class CleanupManager:
     """Manage cleanup operations."""
 
     def __init__(self):
-        self._cleanup_handlers: List[...] = field(default_factory=list)
-        self._temp_dirs: List[...] = field(default_factory=list)
+        self._cleanup_handlers: List[Callable] = []
+        self._temp_dirs: List[Path] = []
 
     async def register_handler(self, handler: Callable) -> None:
         """Register cleanup handler."""
@@ -141,7 +141,7 @@ class TempFileManager:
     def __init__(self, base_dir: Path = None):
         self.base_dir = base_dir or Path(tempfile.gettempdir()) / "claude-code"
         self.base_dir.mkdir(parents=True, exist_ok=True)
-        self._created_files: List[...] = field(default_factory=list)
+        self._created_files: List[Path] = []
 
     def create_temp_file(
         self,
